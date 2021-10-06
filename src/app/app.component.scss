@@ -1,0 +1,32 @@
+.app-root {
+  .week-table {
+    display: flex;
+    flex-direction: column;
+    margin: 24px;
+
+    .slot-form {
+      display: flex;
+    }
+
+    .day-head {
+      display: flex;
+      border-bottom: 2px solid gray;
+    }
+
+    .day {
+      display: flex;
+      flex-direction: column;
+      margin-right: 5px;
+      border-right: 1px solid gray;
+      color: rgb(215, 211, 241);
+      min-width: 140px;
+      max-width: 140px;
+      align-items: center;
+      text-align: center;
+
+      &.today {
+        background-color: rgb(83, 82, 93);
+      }
+    }
+  }
+}
