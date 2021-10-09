@@ -4,6 +4,9 @@ import {
   OnInit,
   ViewEncapsulation,
 } from '@angular/core';
+import { Observable } from 'rxjs';
+import { User } from './services/db-models';
+import { FirebaseService } from './services/firebase.service';
 
 @Component({
   selector: 'app-root',
@@ -29,10 +32,14 @@ export class AppComponent implements OnInit {
     { name: 'Páva10', id: '1' },
   ];
 
+  users$: Observable<User[]> | undefined;
+
   @HostBinding('class.app-root') hostCss = true;
 
   private readonly msPerDay = 1000 * 60 * 60 * 24;
   private newReservations: Record<number, number> = {};
+
+  constructor(private firebaseService: FirebaseService) {}
 
   ngOnInit() {
     this.today = new Date();
@@ -43,6 +50,8 @@ export class AppComponent implements OnInit {
         const timeForDayIndex = todayTime + dayIndex * this.msPerDay;
         return { date: new Date(timeForDayIndex) };
       });
+
+    this.users$ = this.firebaseService.getUsers();
   }
 
   changeTakeParkingSlot(event: Event, column: number, row: number) {
