@@ -1,25 +1,33 @@
 <div class="week-table">
   <div class="day-head">
-    <div
-      *ngFor="let date of dates"
-      class="day"
-      [ngClass]="{ today: date.today }"
-    >
+    <div *ngFor="let day of days" class="day">
       <h2>
-        {{ date.date | date: "EEEE, MMMM d" }}
+        {{ day.date | date: "EEEE, MMMM d" }}
       </h2>
     </div>
   </div>
-  <form class="slot-form">
-    <div
-      *ngFor="let date of dates; index as i"
-      class="day"
-      [ngClass]="{ today: date.today }"
-    >
-      <div class="slot-form">
-        <input type="radio" id="{{ i * 10 + 1 }}" />
-        <label [attr.for]="i * 10 + 1">Hubsson 1</label>
+  <form class="parking-slot-form">
+    <div *ngFor="let day of days; index as column" class="day">
+      <div
+        *ngFor="let parkingSlot of parkingSlots; index as row"
+        class="parking-slot-form-group"
+      >
+        <input
+          type="radio"
+          id="{{ column * 100 + row }}"
+          [attr.name]="'parkingSlotDay' + column"
+          (change)="changeTakeParkingSlot($event, column, row)"
+        />
+        <label
+          class="parking-slot-form-group-slot-name"
+          [ngClass]="{ free: isSlotFree(day.date, parkingSlot.id) }"
+          [attr.for]="column * 100 + row"
+          >{{ parkingSlot.name }}</label
+        >
       </div>
     </div>
   </form>
+  <div class="submit-group">
+    <button (click)="onSave()">Save</button>
+  </div>
 </div>
