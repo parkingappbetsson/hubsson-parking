@@ -10,21 +10,42 @@
   .parking-slot-form {
     display: flex;
 
-    &-group {
+    &-slot {
       display: flex;
+      flex-direction: column;
       font-size: 1.4rem;
-      line-height: 3rem;
+      height: 3rem;
       align-items: baseline;
       min-width: inherit;
       max-width: inherit;
+      margin-bottom: 5px;
 
-      &-slot-name.free::after {
+      &-name.free::after {
         content: "|";
         color: rgba(144, 238, 144, 0.4);
         display: inline-block;
         font-size: 1.6rem;
         margin-left: 3px;
         vertical-align: bottom;
+      }
+
+      &-name:not(.free)::after {
+        content: "|";
+        color: rgba(241, 28, 28, 0.4);
+        display: inline-block;
+        font-size: 1.6rem;
+        margin-left: 3px;
+        vertical-align: bottom;
+      }
+
+      &-form-group {
+        line-height: 2.1rem;
+      }
+
+      &-reserver {
+        font-size: 0.7rem;
+        line-height: 0.8rem;
+        padding-left: 18px;
       }
     }
 
@@ -50,11 +71,16 @@
 
   .submit-group {
     display: flex;
+    align-items: center;
+    margin: 20px 0;
 
     button {
       width: fit-content;
       font-size: 1.6rem;
-      margin: 20px 0;
+    }
+
+    &-users {
+      margin-left: 12px;
     }
   }
 

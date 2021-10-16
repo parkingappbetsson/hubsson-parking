@@ -1,12 +1,22 @@
 import {
+  ChangeDetectorRef,
   Component,
   HostBinding,
+  OnDestroy,
   OnInit,
   ViewEncapsulation,
 } from '@angular/core';
-import { Observable } from 'rxjs';
-import { User } from './services/db-models';
+import { Timestamp } from '@firebase/firestore';
+import { merge, Observable, Subscription } from 'rxjs';
+import { tap } from 'rxjs/operators';
+import { Reservation, ReservationDTO, User } from './services/db-models';
 import { FirebaseService } from './services/firebase.service';
+
+interface Day {
+  date: Date;
+  index: number;
+}
+type DayIndex = number;
 
 @Component({
   selector: 'app-root',
@@ -14,59 +24,104 @@ import { FirebaseService } from './services/firebase.service';
   styleUrls: ['./app.component.scss'],
   encapsulation: ViewEncapsulation.None,
 })
-export class AppComponent implements OnInit {
-  days: { date: Date }[] | undefined;
-  today: Date | undefined;
+export class AppComponent implements OnInit, OnDestroy {
   readonly parkingSlots = [
     { name: 'Hubsson1', id: '0' },
     { name: 'Hubsson2', id: '1' },
-    { name: 'Páva1', id: '1' },
-    { name: 'Páva2', id: '1' },
-    { name: 'Páva3', id: '1' },
-    { name: 'Páva4', id: '1' },
-    { name: 'Páva5', id: '1' },
-    { name: 'Páva6', id: '1' },
-    { name: 'Páva7', id: '1' },
-    { name: 'Páva8', id: '1' },
-    { name: 'Páva9', id: '1' },
-    { name: 'Páva10', id: '1' },
+    { name: 'Páva1', id: '2' },
+    { name: 'Páva2', id: '3' },
+    { name: 'Páva3', id: '4' },
+    { name: 'Páva4', id: '5' },
+    { name: 'Páva5', id: '6' },
+    { name: 'Páva6', id: '7' },
+    { name: 'Páva7', id: '8' },
+    { name: 'Páva8', id: '9' },
+    { name: 'Páva9', id: '10' },
+    { name: 'Páva10', id: '11' },
   ];
 
-  users$: Observable<User[]> | undefined;
+  days: Day[] = Array(10).fill(0);
+  selectedUserId = 'default';
+  users: User[] | undefined;
 
   @HostBinding('class.app-root') hostCss = true;
 
   private readonly msPerDay = 1000 * 60 * 60 * 24;
-  private newReservations: Record<number, number> = {};
+  private newReservations: Record<DayIndex, number> = {};
+  private previousReservations: Reservation[] | undefined;
+  private data$$: Subscription | undefined;
 
-  constructor(private firebaseService: FirebaseService) {}
+  constructor(
+    private firebaseService: FirebaseService,
+    private cdRef: ChangeDetectorRef
+  ) {}
 
   ngOnInit() {
-    this.today = new Date();
-    const todayTime = this.today.getTime();
-    this.days = Array(10)
-      .fill(0)
-      .map((_, dayIndex: number) => {
-        const timeForDayIndex = todayTime + dayIndex * this.msPerDay;
-        return { date: new Date(timeForDayIndex) };
-      });
+    const todayTime = new Date().getTime();
+    this.days = this.days.map((_, dayIndex: number) => {
+      const timeForDayIndex = todayTime + dayIndex * this.msPerDay;
+      return { date: new Date(timeForDayIndex), index: dayIndex };
+    });
 
-    this.users$ = this.firebaseService.getUsers();
+    const users$ = this.firebaseService
+      .getUsers$()
+      .pipe(tap((users) => (this.users = users)));
+    const previousReservations$ = this.firebaseService
+      .getPreviousReservations$()
+      .pipe(
+        tap((previousReservations) => {
+          this.previousReservations = previousReservations;
+        })
+      );
+    this.data$$ = merge(users$, previousReservations$).subscribe(() =>
+      this.cdRef.markForCheck()
+    );
   }
 
-  changeTakeParkingSlot(event: Event, column: number, row: number) {
+  ngOnDestroy() {
+    this.data$$?.unsubscribe();
+  }
+
+  changeTakeParkingSlot(event: Event, day: Day, parkingSlot: number) {
     if (!(event.target as HTMLInputElement)?.checked) {
       return;
     }
-    this.newReservations[column] = row;
+    this.newReservations[day.index] = parkingSlot;
   }
 
   onSave() {
-    // TODO
+    const newReservations: ReservationDTO[] = Object.entries(
+      this.newReservations
+    ).map(([dayIndex, parkingSlot]) => ({
+      userId: this.selectedUserId,
+      parkingSlot: parkingSlot.toString(),
+      day: Timestamp.fromDate(this.days[+dayIndex].date),
+    }));
+    this.firebaseService.saveReservations$(newReservations);
   }
 
+  // TODO: use a map instead, it's called a lot
   isSlotFree(date: Date, parkingSlotId: string): boolean {
-    // TODO
-    return date && !!parkingSlotId;
+    return !this.previousReservations?.some(
+      (previousReservation) =>
+        previousReservation.parkingSlot === parkingSlotId &&
+        previousReservation.day.getDate() === date.getDate()
+    );
+  }
+
+  getReserver(date: Date, parkingSlotId: string): string {
+    const reservation = this.previousReservations?.find(
+      (previousReservation) =>
+        previousReservation.parkingSlot === parkingSlotId &&
+        previousReservation.day.getDate() === date.getDate()
+    );
+    if (!reservation) {
+      return '';
+    }
+    const reserver = this.users?.find((user) => user.id === reservation.userId);
+    if (!reserver) {
+      return '';
+    }
+    return `${reserver.name} ${reserver.plate}`;
   }
 }

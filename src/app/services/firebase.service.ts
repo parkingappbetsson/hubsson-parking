@@ -1,15 +1,21 @@
 import { Injectable } from '@angular/core';
 import {
   connectFirestoreEmulator,
+  doc,
   Firestore,
   getDocs,
   initializeFirestore,
+  query,
+  setDoc,
+  Timestamp,
+  where,
+  writeBatch,
 } from 'firebase/firestore';
 import { FirebaseApp, initializeApp } from 'firebase/app';
 import { collection } from 'firebase/firestore';
 import { from, Observable } from 'rxjs';
 import { environment } from 'src/environments/environment';
-import { User } from './db-models';
+import { Reservation, ReservationDTO, User } from './db-models';
 
 const firebaseConfig = {
   apiKey: 'AIzaSyD9RZ8BHR_3lHXI2SmCTbhBuj9CaslHVFY',
@@ -20,6 +26,7 @@ const firebaseConfig = {
   appId: '1:1061531745136:web:2d5a32fb2e7e1629ebedb5',
 };
 const USERS_COLLECTION = 'users';
+const RESERVATIONS_COLLECTION = 'reservations';
 
 @Injectable({
   providedIn: 'root',
@@ -48,7 +55,50 @@ export class FirebaseService {
     return users;
   }
 
-  getUsers(): Observable<User[]> {
+  private async _saveReservations(
+    reservations: ReservationDTO[]
+  ): Promise<void> {
+    var batch = writeBatch(this.db);
+    for (const reservation of reservations) {
+      const newResercationDoc = doc(
+        collection(this.db, RESERVATIONS_COLLECTION)
+      );
+      batch.set(newResercationDoc, reservation);
+    }
+    return batch.commit();
+  }
+
+  private async _getPreviousReservations(): Promise<Reservation[]> {
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    const startDate = Timestamp.fromDate(today);
+    const reservationCollestion = collection(this.db, RESERVATIONS_COLLECTION);
+    const reservationsQuery = query(
+      reservationCollestion,
+      where('day', '>=', startDate)
+    );
+    const reservations: Reservation[] = [];
+    const reservationsSnapshot = await getDocs(reservationsQuery);
+    reservationsSnapshot.forEach((doc) => {
+      const { day, userId, parkingSlot } = doc.data();
+      reservations.push({
+        userId,
+        parkingSlot,
+        day: (day as Timestamp).toDate(),
+      });
+    });
+    return reservations;
+  }
+
+  getUsers$(): Observable<User[]> {
     return from(this._getUsers());
+  }
+
+  saveReservations$(reservations: ReservationDTO[]): Observable<void> {
+    return from(this._saveReservations(reservations));
+  }
+
+  getPreviousReservations$(): Observable<Reservation[]> {
+    return from(this._getPreviousReservations());
   }
 }
