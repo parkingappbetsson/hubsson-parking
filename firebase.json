@@ -1,11 +1,7 @@
 {
   "hosting": {
     "public": "dist/hubsson-parking",
-    "ignore": [
-      "firebase.json",
-      "**/.*",
-      "**/node_modules/**"
-    ],
+    "ignore": ["firebase.json", "**/.*", "**/node_modules/**"],
     "rewrites": [
       {
         "source": "**",
@@ -21,7 +17,11 @@
       "enabled": true
     },
     "firestore": {
-      "port": 8080
+      "port": 8080,
+      "rules": "./firestore.rules"
+    },
+    "auth": {
+      "port": 9099
     }
   }
 }

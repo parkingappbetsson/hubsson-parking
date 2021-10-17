@@ -7,8 +7,8 @@ import {
   ViewEncapsulation,
 } from '@angular/core';
 import { Timestamp } from '@firebase/firestore';
-import { merge, Observable, Subscription } from 'rxjs';
-import { tap } from 'rxjs/operators';
+import { merge, Subscription } from 'rxjs';
+import { filter, switchMap, tap, withLatestFrom } from 'rxjs/operators';
 import { Reservation, ReservationDTO, User } from './services/db-models';
 import { FirebaseService } from './services/firebase.service';
 
@@ -63,16 +63,22 @@ export class AppComponent implements OnInit, OnDestroy {
       return { date: new Date(timeForDayIndex), index: dayIndex };
     });
 
-    const users$ = this.firebaseService
-      .getUsers$()
-      .pipe(tap((users) => (this.users = users)));
-    const previousReservations$ = this.firebaseService
-      .getPreviousReservations$()
-      .pipe(
-        tap((previousReservations) => {
-          this.previousReservations = previousReservations;
-        })
-      );
+    const auth$ = this.firebaseService.login$().pipe(
+      filter((val) => {
+        return val === true;
+      })
+    );
+
+    const users$ = auth$.pipe(
+      switchMap(() => this.firebaseService.getUsers$()),
+      tap((users) => (this.users = users))
+    );
+    const previousReservations$ = auth$.pipe(
+      switchMap(() => this.firebaseService.getPreviousReservations$()),
+      tap((previousReservations) => {
+        this.previousReservations = previousReservations;
+      })
+    );
     this.data$$ = merge(users$, previousReservations$).subscribe(() =>
       this.cdRef.markForCheck()
     );

@@ -6,7 +6,6 @@ import {
   getDocs,
   initializeFirestore,
   query,
-  setDoc,
   Timestamp,
   where,
   writeBatch,
@@ -16,6 +15,12 @@ import { collection } from 'firebase/firestore';
 import { from, Observable } from 'rxjs';
 import { environment } from 'src/environments/environment';
 import { Reservation, ReservationDTO, User } from './db-models';
+import {
+  Auth,
+  connectAuthEmulator,
+  getAuth,
+  signInAnonymously,
+} from 'firebase/auth';
 
 const firebaseConfig = {
   apiKey: 'AIzaSyD9RZ8BHR_3lHXI2SmCTbhBuj9CaslHVFY',
@@ -34,14 +39,17 @@ const RESERVATIONS_COLLECTION = 'reservations';
 export class FirebaseService {
   private readonly app: FirebaseApp;
   private readonly db: Firestore;
+  private readonly auth: Auth;
 
   constructor() {
     this.app = initializeApp(firebaseConfig);
 
     this.db = initializeFirestore(this.app, {});
+    this.auth = getAuth();
 
     if (!environment.production) {
       connectFirestoreEmulator(this.db, 'localhost', 8080);
+      connectAuthEmulator(this.auth, 'http://localhost:9099');
     }
   }
 
@@ -90,6 +98,15 @@ export class FirebaseService {
     return reservations;
   }
 
+  private async _login(): Promise<boolean> {
+    try {
+      await signInAnonymously(this.auth);
+      return true;
+    } catch (error) {
+      return false;
+    }
+  }
+
   getUsers$(): Observable<User[]> {
     return from(this._getUsers());
   }
@@ -100,5 +117,9 @@ export class FirebaseService {
 
   getPreviousReservations$(): Observable<Reservation[]> {
     return from(this._getPreviousReservations());
+  }
+
+  login$(): Observable<boolean> {
+    return from(this._login());
   }
 }
