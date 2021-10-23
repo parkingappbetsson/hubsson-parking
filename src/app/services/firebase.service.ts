@@ -52,7 +52,7 @@ export class FirebaseService {
 
     this.db = initializeFirestore(this.app, {});
     this.auth = getAuth();
-    this.functions = getFunctions(this.app);
+    this.functions = getFunctions(this.app, 'europe-west1');
 
     if (!environment.production) {
       connectFirestoreEmulator(this.db, 'localhost', 8080);

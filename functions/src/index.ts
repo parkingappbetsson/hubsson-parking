@@ -11,8 +11,17 @@ const firebaseConfig = {
 };
 const app = admin.initializeApp(firebaseConfig);
 
-export const checkSecretCode = functions.https.onCall(
+export const checkSecretCode = functions.region('europe-west1').https.onCall(
   async (data: any, context: functions.https.CallableContext) => {
+    // context.app will be undefined if the request doesn't include a valid
+    // App Check token.
+    if (context.app == undefined) {
+      throw new functions.https.HttpsError(
+        'failed-precondition',
+        'The function must be called from an App Check verified app.'
+      );
+    }
+
     const firestore = admin.firestore(app);
     const docs = await firestore.collection('secret-code').listDocuments();
     const validSecretCode = (await docs[0].get()).get('secretCode');
