@@ -1,7 +1,9 @@
 import { Injectable } from '@angular/core';
 import {
+  CollectionReference,
   connectFirestoreEmulator,
   doc,
+  DocumentData,
   Firestore,
   getDocs,
   initializeFirestore,
@@ -21,11 +23,6 @@ import {
   getAuth,
   signInAnonymously,
 } from 'firebase/auth';
-import {
-  getFunctions,
-  Functions,
-  connectFunctionsEmulator,
-} from 'firebase/functions';
 
 const firebaseConfig = {
   apiKey: 'AIzaSyB6rWaLwb8DsrYs7NMgZi0Avnqvun4k8UU',
@@ -37,6 +34,7 @@ const firebaseConfig = {
 };
 const USERS_COLLECTION = 'users';
 const RESERVATIONS_COLLECTION = 'reservations';
+const SECRET_CODE_COLLECTION = 'secret-code';
 
 @Injectable({
   providedIn: 'root',
@@ -45,19 +43,16 @@ export class FirebaseService {
   private readonly app: FirebaseApp;
   private readonly db: Firestore;
   private readonly auth: Auth;
-  private readonly functions: Functions;
 
   constructor() {
     this.app = initializeApp(firebaseConfig);
 
     this.db = initializeFirestore(this.app, {});
     this.auth = getAuth();
-    this.functions = getFunctions(this.app);
 
     if (!environment.production) {
       connectFirestoreEmulator(this.db, 'localhost', 8080);
       connectAuthEmulator(this.auth, 'http://localhost:9099');
-      connectFunctionsEmulator(this.functions, 'localhost', 5001);
     }
   }
 
@@ -131,7 +126,7 @@ export class FirebaseService {
     return from(this._login());
   }
 
-  getFunctions(): Functions {
-    return this.functions;
+  getSecretCollection(): CollectionReference<DocumentData> {
+    return collection(this.db, SECRET_CODE_COLLECTION);
   }
 }

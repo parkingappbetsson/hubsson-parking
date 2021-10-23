@@ -23,8 +23,5 @@
     "auth": {
       "port": 9099
     }
-  },
-  "functions": {
-    "predeploy": ["npm --prefix functions run build"]
   }
 }

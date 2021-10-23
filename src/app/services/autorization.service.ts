@@ -1,16 +1,20 @@
 import { Injectable } from '@angular/core';
 import { FirebaseService } from './firebase.service';
-import { httpsCallable } from 'firebase/functions';
 import { from } from 'rxjs';
+import { where, query, getDocs } from 'firebase/firestore';
 
 @Injectable({ providedIn: 'root' })
 export class AuthorizationService {
   constructor(private firebaseService: FirebaseService) {}
 
   async _authorize(secretCode: string): Promise<any> {
-    const functions = this.firebaseService.getFunctions();
-    const checkSecretCode = httpsCallable(functions, 'checkSecretCode');
-    return checkSecretCode({ text: secretCode });
+    const secretCodeCollection = this.firebaseService.getSecretCollection();
+    const secretCodeQuery = query(
+      secretCodeCollection,
+      where('secretCode', '==', secretCode)
+    );
+    const reservationsSnapshot = await getDocs(secretCodeQuery);
+    return !reservationsSnapshot.empty;
   }
 
   authorize(secretCode: string) {

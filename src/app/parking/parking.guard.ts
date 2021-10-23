@@ -24,12 +24,6 @@ export class ParkingGuard implements CanActivate {
     if (!secretCode) {
       return fallback$;
     }
-    return this.authorizationService.authorize(secretCode).pipe(
-      map((response) => !!response.data?.valid),
-      catchError(() => {
-        StorageService.remove(SECRET_CODE_KEY, StorageType.Local);
-        return fallback$;
-      })
-    );
+    return this.authorizationService.authorize(secretCode);
   }
 }

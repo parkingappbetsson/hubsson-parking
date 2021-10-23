@@ -29,16 +29,14 @@ export class ParkingComponent implements OnInit, OnDestroy {
   readonly parkingSlots = [
     { name: 'Hubsson1', id: '0' },
     { name: 'Hubsson2', id: '1' },
-    { name: 'Páva1', id: '2' },
-    { name: 'Páva2', id: '3' },
-    { name: 'Páva3', id: '4' },
-    { name: 'Páva4', id: '5' },
-    { name: 'Páva5', id: '6' },
-    { name: 'Páva6', id: '7' },
-    { name: 'Páva7', id: '8' },
-    { name: 'Páva8', id: '9' },
-    { name: 'Páva9', id: '10' },
-    { name: 'Páva10', id: '11' },
+    { name: 'Páva 908', id: '2' },
+    { name: 'Páva 909', id: '3' },
+    { name: 'Páva 912', id: '4' },
+    { name: 'Páva 913', id: '5' },
+    { name: 'Páva 914', id: '6' },
+    { name: 'Páva 915', id: '7' },
+    { name: 'Páva 917', id: '8' },
+    { name: 'Páva 924', id: '9' },
   ];
 
   days: Day[] = Array(10).fill(0);
