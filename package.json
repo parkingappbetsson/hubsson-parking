@@ -6,7 +6,8 @@
     "start": "ng serve",
     "build": "ng build",
     "watch": "ng build --watch --configuration development",
-    "start-emulator": "firebase emulators:start --export-on-exit=./firestore-data --import=./firestore-data",
+    "start-emulator": "npm run build-functions && firebase emulators:start --export-on-exit=./firestore-data --import=./firestore-data",
+    "build-functions": "npm --prefix functions run build",
     "test": "ng test"
   },
   "private": true,

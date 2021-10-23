@@ -21,6 +21,11 @@ import {
   getAuth,
   signInAnonymously,
 } from 'firebase/auth';
+import {
+  getFunctions,
+  Functions,
+  connectFunctionsEmulator,
+} from 'firebase/functions';
 
 const firebaseConfig = {
   apiKey: 'AIzaSyD9RZ8BHR_3lHXI2SmCTbhBuj9CaslHVFY',
@@ -40,16 +45,19 @@ export class FirebaseService {
   private readonly app: FirebaseApp;
   private readonly db: Firestore;
   private readonly auth: Auth;
+  private readonly functions: Functions;
 
   constructor() {
     this.app = initializeApp(firebaseConfig);
 
     this.db = initializeFirestore(this.app, {});
     this.auth = getAuth();
+    this.functions = getFunctions(this.app);
 
     if (!environment.production) {
       connectFirestoreEmulator(this.db, 'localhost', 8080);
       connectAuthEmulator(this.auth, 'http://localhost:9099');
+      connectFunctionsEmulator(this.functions, 'localhost', 5001);
     }
   }
 
@@ -121,5 +129,9 @@ export class FirebaseService {
 
   login$(): Observable<boolean> {
     return from(this._login());
+  }
+
+  getFunctions(): Functions {
+    return this.functions;
   }
 }
