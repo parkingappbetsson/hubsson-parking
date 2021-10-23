@@ -27,15 +27,13 @@ import {
   connectFunctionsEmulator,
 } from 'firebase/functions';
 
-import { initializeAppCheck, ReCaptchaV3Provider } from 'firebase/app-check';
-
 const firebaseConfig = {
-  apiKey: 'AIzaSyD9RZ8BHR_3lHXI2SmCTbhBuj9CaslHVFY',
+  apiKey: 'AIzaSyB6rWaLwb8DsrYs7NMgZi0Avnqvun4k8UU',
   authDomain: 'hubsson-parking.firebaseapp.com',
   projectId: 'hubsson-parking',
   storageBucket: 'hubsson-parking.appspot.com',
   messagingSenderId: '1061531745136',
-  appId: '1:1061531745136:web:2d5a32fb2e7e1629ebedb5',
+  appId: '1:1061531745136:web:dc6eb056860850f9ebedb5',
 };
 const USERS_COLLECTION = 'users';
 const RESERVATIONS_COLLECTION = 'reservations';
@@ -52,19 +50,9 @@ export class FirebaseService {
   constructor() {
     this.app = initializeApp(firebaseConfig);
 
-    initializeAppCheck(this.app, {
-      provider: new ReCaptchaV3Provider(
-        'abcdefghijklmnopqrstuvwxy-1234567890abcd'
-      ),
-
-      // Optional argument. If true, the SDK automatically refreshes App Check
-      // tokens as needed.
-      isTokenAutoRefreshEnabled: true,
-    });
-
     this.db = initializeFirestore(this.app, {});
     this.auth = getAuth();
-    this.functions = getFunctions(this.app, 'europe-west1');
+    this.functions = getFunctions(this.app);
 
     if (!environment.production) {
       connectFirestoreEmulator(this.db, 'localhost', 8080);
