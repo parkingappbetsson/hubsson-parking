@@ -27,6 +27,8 @@ import {
   connectFunctionsEmulator,
 } from 'firebase/functions';
 
+import { initializeAppCheck, ReCaptchaV3Provider } from 'firebase/app-check';
+
 const firebaseConfig = {
   apiKey: 'AIzaSyD9RZ8BHR_3lHXI2SmCTbhBuj9CaslHVFY',
   authDomain: 'hubsson-parking.firebaseapp.com',
@@ -49,6 +51,16 @@ export class FirebaseService {
 
   constructor() {
     this.app = initializeApp(firebaseConfig);
+
+    initializeAppCheck(this.app, {
+      provider: new ReCaptchaV3Provider(
+        'abcdefghijklmnopqrstuvwxy-1234567890abcd'
+      ),
+
+      // Optional argument. If true, the SDK automatically refreshes App Check
+      // tokens as needed.
+      isTokenAutoRefreshEnabled: true,
+    });
 
     this.db = initializeFirestore(this.app, {});
     this.auth = getAuth();
