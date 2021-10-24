@@ -11,3 +11,34 @@ body {
 body {
 	margin: 0;
 }
+
+button {
+	color: #fff;
+	background-color: #343a40;
+	border-color: #343a40;
+	padding: 10px;
+
+	&:focus {
+		box-shadow: 0 0 0 0.2rem rgb(52 58 64 / 50%);
+	}
+
+	&:not(:disabled):not(.disabled) {
+		cursor: pointer;
+		&:active {
+			color: #fff;
+			background-color: #1d2124;
+			border-color: #171a1d;
+		}
+	}
+
+	&:hover {
+		color: #fff;
+		background-color: #23272b;
+		border-color: #1d2124;
+	}
+
+	&.disabled,
+	&:disabled {
+		opacity: 0.65;
+	}
+}

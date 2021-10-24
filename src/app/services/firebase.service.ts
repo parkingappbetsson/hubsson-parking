@@ -1,10 +1,12 @@
 import { Injectable } from '@angular/core';
 import {
+	addDoc,
 	CollectionReference,
 	connectFirestoreEmulator,
 	doc,
 	DocumentData,
 	Firestore,
+	getDoc,
 	getDocs,
 	initializeFirestore,
 	query,
@@ -14,7 +16,7 @@ import {
 } from 'firebase/firestore';
 import { FirebaseApp, initializeApp } from 'firebase/app';
 import { collection } from 'firebase/firestore';
-import { from, Observable } from 'rxjs';
+import { BehaviorSubject, from, Observable, of, Subject } from 'rxjs';
 import { environment } from 'src/environments/environment';
 import { Reservation, ReservationDTO, User } from './db-models';
 import { Auth, connectAuthEmulator, getAuth, signInAnonymously } from 'firebase/auth';
@@ -39,6 +41,11 @@ export class FirebaseService {
 	private readonly db: Firestore;
 	private readonly auth: Auth;
 
+	private users: User[];
+	private users$: BehaviorSubject<User[] | undefined>;
+	private reservations: Reservation[];
+	private reservations$: BehaviorSubject<Reservation[] | undefined>;
+
 	constructor() {
 		this.app = initializeApp(firebaseConfig);
 
@@ -49,33 +56,74 @@ export class FirebaseService {
 			connectFirestoreEmulator(this.db, 'localhost', 8080);
 			connectAuthEmulator(this.auth, 'http://localhost:9099');
 		}
+		this.users$ = new BehaviorSubject<User[] | undefined>(undefined);
+		this.reservations$ = new BehaviorSubject<Reservation[] | undefined>(undefined);
+		this.users = [];
+		this.reservations = [];
 	}
 
-	private async _getUsers(): Promise<User[]> {
+	private async _getUsers(): Promise<void> {
 		const querySnapshot = await getDocs(collection(this.db, USERS_COLLECTION));
 		const users: User[] = [];
 		querySnapshot.forEach((doc) => {
 			const data = doc.data();
 			users.push(data as User);
 		});
-		return users;
+		this.users = users;
+		this.users$.next(this.users);
 	}
 
-	private async _saveReservations(reservations: ReservationDTO[]): Promise<void> {
+	private async _saveUser(newUser: User): Promise<void> {
+		addDoc(collection(this.db, USERS_COLLECTION), newUser);
+		this.users.push(newUser);
+		this.users$.next(this.users);
+	}
+
+	private async _saveReservations(newReservations: ReservationDTO[]): Promise<boolean> {
 		var batch = writeBatch(this.db);
-		for (const reservation of reservations) {
-			const newResercationDoc = doc(collection(this.db, RESERVATIONS_COLLECTION));
-			batch.set(newResercationDoc, reservation);
+		const reservationCollection = collection(this.db, RESERVATIONS_COLLECTION);
+
+		for (const newReservation of newReservations) {
+			const updateIndex = this.reservations.findIndex(
+				(oldReservation) =>
+					oldReservation.day.getTime() === newReservation.day.toDate().getTime() &&
+					oldReservation.userId === newReservation.userId
+			);
+			if (updateIndex !== -1) {
+				const reservationQuery = query(
+					reservationCollection,
+					where('day', '==', newReservation.day),
+					where('userId', '==', newReservation.userId)
+				);
+				const reservationDoc = await getDocs(reservationQuery);
+				batch.update(reservationDoc.docs[0].ref, { parkingSlot: newReservation.parkingSlot });
+				this.reservations[updateIndex].parkingSlot = newReservation.parkingSlot;
+				continue;
+			}
+			const newResercationDoc = doc(reservationCollection);
+			batch.set(newResercationDoc, newReservation);
 		}
-		return batch.commit();
+		await batch.commit();
+
+		newReservations.forEach((reservation) => {
+			const { day, userId, parkingSlot } = reservation;
+			this.reservations.push({
+				userId,
+				parkingSlot,
+				day: (day as Timestamp).toDate(),
+			});
+		});
+		this.reservations$.next(this.reservations);
+
+		return true;
 	}
 
-	private async _getPreviousReservations(): Promise<Reservation[]> {
+	private async _getPreviousReservations(): Promise<void> {
 		const today = new Date();
 		today.setHours(0, 0, 0, 0);
 		const startDate = Timestamp.fromDate(today);
-		const reservationCollestion = collection(this.db, RESERVATIONS_COLLECTION);
-		const reservationsQuery = query(reservationCollestion, where('day', '>=', startDate));
+		const reservationCollection = collection(this.db, RESERVATIONS_COLLECTION);
+		const reservationsQuery = query(reservationCollection, where('day', '>=', startDate));
 		const reservations: Reservation[] = [];
 		const reservationsSnapshot = await getDocs(reservationsQuery);
 		reservationsSnapshot.forEach((doc) => {
@@ -86,7 +134,8 @@ export class FirebaseService {
 				day: (day as Timestamp).toDate(),
 			});
 		});
-		return reservations;
+		this.reservations = reservations;
+		this.reservations$.next(reservations);
 	}
 
 	private async _login(): Promise<boolean> {
@@ -98,16 +147,22 @@ export class FirebaseService {
 		}
 	}
 
-	getUsers$(): Observable<User[]> {
-		return from(this._getUsers());
+	getUsers$(): Observable<User[] | undefined> {
+		this._getUsers();
+		return this.users$.asObservable();
 	}
 
-	saveReservations$(reservations: ReservationDTO[]): Observable<void> {
+	saveUser$(newUser: User): Observable<void> {
+		return from(this._saveUser(newUser));
+	}
+
+	saveReservations$(reservations: ReservationDTO[]): Observable<boolean> {
 		return from(this._saveReservations(reservations));
 	}
 
-	getPreviousReservations$(): Observable<Reservation[]> {
-		return from(this._getPreviousReservations());
+	getPreviousReservations$(): Observable<Reservation[] | undefined> {
+		this._getPreviousReservations();
+		return this.reservations$.asObservable();
 	}
 
 	login$(): Observable<boolean> {

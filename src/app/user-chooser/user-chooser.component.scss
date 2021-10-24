@@ -6,12 +6,25 @@
 	justify-content: center;
 	height: 100%;
 
-	button {
+	& > * {
 		margin-top: 10px;
+	}
+
+	input {
+		margin-top: 0;
 	}
 
 	input,
 	button {
 		font-size: 1.7rem;
+	}
+
+	select,
+	option {
+		font-size: 1.1rem;
+	}
+
+	label {
+		font-size: 1.1rem;
 	}
 }

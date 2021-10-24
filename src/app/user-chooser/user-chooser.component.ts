@@ -1,4 +1,12 @@
-import { ChangeDetectorRef, Component, HostBinding, OnDestroy, OnInit, ViewEncapsulation } from '@angular/core';
+import {
+	ChangeDetectionStrategy,
+	ChangeDetectorRef,
+	Component,
+	HostBinding,
+	OnDestroy,
+	OnInit,
+	ViewEncapsulation,
+} from '@angular/core';
 import { Router } from '@angular/router';
 import { Subscription } from 'rxjs';
 import { tap } from 'rxjs/operators';
@@ -12,10 +20,11 @@ import { User } from './../services/db-models';
 	templateUrl: './user-chooser.component.html',
 	styleUrls: ['./user-chooser.component.scss'],
 	encapsulation: ViewEncapsulation.None,
+	changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class UserChooserComponent implements OnInit, OnDestroy {
 	@HostBinding('class.hp-user-chooser') hostCss = true;
-	chosenUserId: string | undefined;
+	selectedUserId: string | undefined;
 	users: User[] | undefined;
 	name: string | undefined;
 	plate: string | undefined;
@@ -43,7 +52,7 @@ export class UserChooserComponent implements OnInit, OnDestroy {
 			user = this.createUser();
 			this.saveNewUser(user);
 		} else {
-			user = this.users!.find((user) => user.id === this.chosenUserId)!;
+			user = this.users!.find((user) => user.id === this.selectedUserId)!;
 		}
 		StorageService.setForKey(SELECTED_USER_STORAGE_KEY, user, StorageType.Local);
 		this.router.navigate(['parking']);
@@ -64,6 +73,6 @@ export class UserChooserComponent implements OnInit, OnDestroy {
 	}
 
 	private saveNewUser(user: User) {
-		// TODO
+		this.firebaseService.saveUser$(user);
 	}
 }

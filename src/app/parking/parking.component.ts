@@ -1,8 +1,19 @@
-import { ChangeDetectorRef, Component, HostBinding, OnDestroy, OnInit, ViewEncapsulation } from '@angular/core';
+import {
+	ChangeDetectionStrategy,
+	ChangeDetectorRef,
+	Component,
+	HostBinding,
+	OnDestroy,
+	OnInit,
+	ViewEncapsulation,
+} from '@angular/core';
+import { Router } from '@angular/router';
 
 import { Timestamp } from '@firebase/firestore';
 import { merge, Subscription } from 'rxjs';
-import { filter, switchMap, tap } from 'rxjs/operators';
+import { filter, switchMap, take, tap } from 'rxjs/operators';
+import { SECRET_CODE_STORAGE_KEY, SELECTED_USER_STORAGE_KEY } from '../app.consts';
+import { StorageService, StorageType } from '../services/storage.service';
 import { Reservation, ReservationDTO, User } from './../services/db-models';
 import { FirebaseService } from './../services/firebase.service';
 
@@ -17,6 +28,7 @@ type DayIndex = number;
 	templateUrl: './parking.component.html',
 	styleUrls: ['./parking.component.scss'],
 	encapsulation: ViewEncapsulation.None,
+	changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ParkingComponent implements OnInit, OnDestroy {
 	readonly parkingSlots = [
@@ -33,7 +45,7 @@ export class ParkingComponent implements OnInit, OnDestroy {
 	];
 
 	days: Day[] = Array(10).fill(0);
-	selectedUserId = 'default';
+	selectedUser: User;
 
 	@HostBinding('class.hp-parking') hostCss = true;
 
@@ -41,11 +53,19 @@ export class ParkingComponent implements OnInit, OnDestroy {
 	private newReservations: Record<DayIndex, number> = {};
 	private previousReservations: Reservation[] | undefined;
 	private data$$: Subscription | undefined;
+	private users: User[] | undefined;
 
-	constructor(private firebaseService: FirebaseService, private cdRef: ChangeDetectorRef) {}
+	constructor(private firebaseService: FirebaseService, private cdRef: ChangeDetectorRef, private router: Router) {
+		this.selectedUser = StorageService.getForKey(SELECTED_USER_STORAGE_KEY, StorageType.Local);
+		if (!this.selectedUser) {
+			this.router.navigate(['']);
+		}
+	}
 
 	ngOnInit() {
-		const todayTime = new Date().getTime();
+		const today = new Date();
+		today.setHours(5, 0, 0, 0);
+		const todayTime = today.getTime();
 		this.days = this.days.map((_, dayIndex: number) => {
 			const timeForDayIndex = todayTime + dayIndex * this.msPerDay;
 			return { date: new Date(timeForDayIndex), index: dayIndex };
@@ -56,14 +76,20 @@ export class ParkingComponent implements OnInit, OnDestroy {
 				this.previousReservations = previousReservations;
 			})
 		);
-		this.data$$ = merge(previousReservations$).subscribe(() => this.cdRef.markForCheck());
+		const users$ = this.firebaseService.getUsers$().pipe(
+			filter((users) => !!users),
+			take(1),
+			tap((users) => (this.users = users))
+		);
+
+		this.data$$ = merge(previousReservations$, users$).subscribe(() => this.cdRef.markForCheck());
 	}
 
 	ngOnDestroy() {
 		this.data$$?.unsubscribe();
 	}
 
-	changeTakeParkingSlot(event: Event, day: Day, parkingSlot: number) {
+	onTakeParkingSlot(event: Event, day: Day, parkingSlot: number) {
 		if (!(event.target as HTMLInputElement)?.checked) {
 			return;
 		}
@@ -73,7 +99,7 @@ export class ParkingComponent implements OnInit, OnDestroy {
 	onSave() {
 		const newReservations: ReservationDTO[] = Object.entries(this.newReservations).map(
 			([dayIndex, parkingSlot]) => ({
-				userId: this.selectedUserId,
+				userId: this.selectedUser!.id,
 				parkingSlot: parkingSlot.toString(),
 				day: Timestamp.fromDate(this.days[+dayIndex].date),
 			})
@@ -99,11 +125,20 @@ export class ParkingComponent implements OnInit, OnDestroy {
 		if (!reservation) {
 			return '';
 		}
-		// TODO
 		const reserver = this.users?.find((user) => user.id === reservation.userId);
 		if (!reserver) {
 			return '';
 		}
 		return `${reserver.name} ${reserver.plate}`;
+	}
+
+	isSaveDisabled(): boolean {
+		return this.newReservations && Object.keys(this.newReservations).length === 0;
+	}
+
+	clearUser() {
+		StorageService.remove(SELECTED_USER_STORAGE_KEY, StorageType.Local);
+		StorageService.remove(SECRET_CODE_STORAGE_KEY, StorageType.Local);
+		this.router.navigate(['']);
 	}
 }

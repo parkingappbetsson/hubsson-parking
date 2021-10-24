@@ -15,7 +15,7 @@
 						id="{{ column * 100 + row }}"
 						[attr.name]="'parkingSlotDay' + column"
 						[disabled]="!isSlotFree(day.date, parkingSlot.id)"
-						(change)="changeTakeParkingSlot($event, day, row)"
+						(change)="onTakeParkingSlot($event, day, row)"
 					/>
 					<label
 						class="parking-slot-form-slot-name"
@@ -31,7 +31,10 @@
 		</div>
 	</form>
 	<div class="submit-group">
-		<button (click)="onSave()" [disabled]="selectedUserId === 'default'">Save</button>
-		<!-- TODO -->
+		<button (click)="onSave()" [disabled]="isSaveDisabled()">Save</button>
+		<p>
+			Saving as <b>{{ selectedUser.name }} {{ selectedUser.plate }}</b>
+		</p>
 	</div>
+	<button (click)="clearUser()">Clear user</button>
 </div>

@@ -6,9 +6,10 @@ import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
 import { ParkingComponent } from './parking/parking.component';
 import { SecretCodeComponent } from './secret-code/secret-code.component';
+import { UserChooserComponent } from './user-chooser/user-chooser.component';
 
 @NgModule({
-	declarations: [AppComponent, ParkingComponent, SecretCodeComponent],
+	declarations: [AppComponent, ParkingComponent, SecretCodeComponent, UserChooserComponent],
 	imports: [BrowserModule, AppRoutingModule, FormsModule],
 	providers: [],
 	bootstrap: [AppComponent],
