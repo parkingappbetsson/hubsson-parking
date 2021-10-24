@@ -41,7 +41,6 @@ export class ParkingComponent implements OnInit, OnDestroy {
 
   days: Day[] = Array(10).fill(0);
   selectedUserId = 'default';
-  users: User[] | undefined;
 
   @HostBinding('class.hp-parking') hostCss = true;
 
@@ -62,23 +61,14 @@ export class ParkingComponent implements OnInit, OnDestroy {
       return { date: new Date(timeForDayIndex), index: dayIndex };
     });
 
-    const auth$ = this.firebaseService.login$().pipe(
-      filter((val) => {
-        return val === true;
-      })
-    );
-
-    const users$ = auth$.pipe(
-      switchMap(() => this.firebaseService.getUsers$()),
-      tap((users) => (this.users = users))
-    );
-    const previousReservations$ = auth$.pipe(
-      switchMap(() => this.firebaseService.getPreviousReservations$()),
-      tap((previousReservations) => {
-        this.previousReservations = previousReservations;
-      })
-    );
-    this.data$$ = merge(users$, previousReservations$).subscribe(() =>
+    const previousReservations$ = this.firebaseService
+      .getPreviousReservations$()
+      .pipe(
+        tap((previousReservations) => {
+          this.previousReservations = previousReservations;
+        })
+      );
+    this.data$$ = merge(previousReservations$).subscribe(() =>
       this.cdRef.markForCheck()
     );
   }
@@ -123,6 +113,7 @@ export class ParkingComponent implements OnInit, OnDestroy {
     if (!reservation) {
       return '';
     }
+    // TODO
     const reserver = this.users?.find((user) => user.id === reservation.userId);
     if (!reserver) {
       return '';

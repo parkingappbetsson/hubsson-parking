@@ -1,5 +1,3 @@
-export const SELECTED_ANSWERS_STORAGE_KEY = 'selectedAnswers';
-
 export enum StorageType {
   Local,
   Session,

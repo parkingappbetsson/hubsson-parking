@@ -40,11 +40,6 @@
     <button (click)="onSave()" [disabled]="selectedUserId === 'default'">
       Save
     </button>
-    <select class="submit-group-users" [(ngModel)]="selectedUserId">
-      <option value="default"></option>
-      <option *ngFor="let user of users" value="{{ user.id }}">
-        {{ user.name }} - {{ user.plate }}
-      </option>
-    </select>
+    <!-- TODO -->
   </div>
 </div>
