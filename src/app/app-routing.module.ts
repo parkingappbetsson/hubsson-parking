@@ -6,13 +6,13 @@ import { SecretCodeComponent } from './secret-code/secret-code.component';
 import { UserChooserComponent } from './user-chooser/user-chooser.component';
 
 const routes: Routes = [
-  { path: '', component: SecretCodeComponent },
-  { path: 'parking', component: ParkingComponent, canActivate: [AuthorizationGuard] },
-  { path: 'choose-user', component: UserChooserComponent, canActivate: [AuthorizationGuard] },
+	{ path: '', component: SecretCodeComponent },
+	{ path: 'parking', component: ParkingComponent, canActivate: [AuthorizationGuard] },
+	{ path: 'choose-user', component: UserChooserComponent, canActivate: [AuthorizationGuard] },
 ];
 
 @NgModule({
-  imports: [RouterModule.forRoot(routes)],
-  exports: [RouterModule],
+	imports: [RouterModule.forRoot(routes)],
+	exports: [RouterModule],
 })
 export class AppRoutingModule {}

@@ -1,17 +1,17 @@
 .hp-user-chooser {
-  display: flex;
-  color: rgb(215, 211, 241);
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  height: 100%;
+	display: flex;
+	color: rgb(215, 211, 241);
+	flex-direction: column;
+	align-items: center;
+	justify-content: center;
+	height: 100%;
 
-  button {
-    margin-top: 10px;
-  }
+	button {
+		margin-top: 10px;
+	}
 
-  input,
-  button {
-    font-size: 1.7rem;
-  }
+	input,
+	button {
+		font-size: 1.7rem;
+	}
 }
