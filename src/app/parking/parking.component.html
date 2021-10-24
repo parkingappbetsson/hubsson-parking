@@ -1,50 +1,40 @@
 <div class="week-table">
-  <div class="day-head">
-    <div *ngFor="let day of days" class="day">
-      <h2>
-        {{ day.date | date: "EEEE, MMMM d" }}
-      </h2>
-    </div>
-  </div>
-  <form class="parking-slot-form">
-    <div *ngFor="let day of days; index as column" class="day">
-      <div
-        *ngFor="let parkingSlot of parkingSlots; index as row"
-        class="parking-slot-form-slot"
-      >
-        <div class="parking-slot-form-slot-form-group">
-          <input
-            type="radio"
-            id="{{ column * 100 + row }}"
-            [attr.name]="'parkingSlotDay' + column"
-            [disabled]="!isSlotFree(day.date, parkingSlot.id)"
-            (change)="changeTakeParkingSlot($event, day, row)"
-          />
-          <label
-            class="parking-slot-form-slot-name"
-            [ngClass]="{ free: isSlotFree(day.date, parkingSlot.id) }"
-            [attr.for]="column * 100 + row"
-            >{{ parkingSlot.name }}</label
-          >
-        </div>
-        <span
-          *ngIf="!isSlotFree(day.date, parkingSlot.id)"
-          class="parking-slot-form-slot-reserver"
-        >
-          {{ getReserver(day.date, parkingSlot.id) }}
-        </span>
-      </div>
-    </div>
-  </form>
-  <div class="submit-group">
-    <button (click)="onSave()" [disabled]="selectedUserId === 'default'">
-      Save
-    </button>
-    <select class="submit-group-users" [(ngModel)]="selectedUserId">
-      <option value="default"></option>
-      <option *ngFor="let user of users" value="{{ user.id }}">
-        {{ user.name }} - {{ user.plate }}
-      </option>
-    </select>
-  </div>
+	<div class="day-head">
+		<div *ngFor="let day of days" class="day">
+			<h2>
+				{{ day.date | date: "EEEE, MMMM d" }}
+			</h2>
+		</div>
+	</div>
+	<form class="parking-slot-form">
+		<div *ngFor="let day of days; index as column" class="day">
+			<div *ngFor="let parkingSlot of parkingSlots; index as row" class="parking-slot-form-slot">
+				<div class="parking-slot-form-slot-form-group">
+					<input
+						type="radio"
+						id="{{ column * 100 + row }}"
+						[attr.name]="'parkingSlotDay' + column"
+						[disabled]="!isSlotFree(day.date, parkingSlot.id)"
+						(change)="onTakeParkingSlot($event, day, row)"
+					/>
+					<label
+						class="parking-slot-form-slot-name"
+						[ngClass]="{ free: isSlotFree(day.date, parkingSlot.id) }"
+						[attr.for]="column * 100 + row"
+						>{{ parkingSlot.name }}</label
+					>
+				</div>
+				<span *ngIf="!isSlotFree(day.date, parkingSlot.id)" class="parking-slot-form-slot-reserver">
+					{{ getReserver(day.date, parkingSlot.id) }}
+				</span>
+			</div>
+		</div>
+	</form>
+	<div class="submit-group">
+		<button (click)="onSave()" [disabled]="isSaveDisabled()">Save</button>
+		<p>
+			Saving as <b>{{ selectedUser.name }} {{ selectedUser.plate }}</b>
+		</p>
+	</div>
+	<button (click)="clearUser()">Clear user</button>
 </div>

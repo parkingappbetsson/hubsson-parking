@@ -1,0 +1,17 @@
+<h2>Choose user or switch to new user creation</h2>
+<ng-container *ngIf="!isCreatingNewUser; else createNewUser">
+	<select class="user-chooser-users" [(ngModel)]="selectedUserId">
+		<option value=""></option>
+		<option *ngFor="let user of users" value="{{ user.id }}">{{ user.name }} - {{ user.plate }}</option>
+	</select>
+	<button *ngIf="selectedUserId" (click)="selectUserAndGo()" [disabled]="!selectedUserId">Enter</button>
+	<button *ngIf="!selectedUserId" (click)="switchToCreate()">Switch</button>
+</ng-container>
+
+<ng-template #createNewUser>
+	<label>Name</label>
+	<input [(ngModel)]="name" (keyup.enter)="selectUserAndGo()" required />
+	<label>Plate number</label>
+	<input [(ngModel)]="plate" (keyup.enter)="selectUserAndGo()" required />
+	<button (click)="selectUserAndGo()">Enter</button>
+</ng-template>
