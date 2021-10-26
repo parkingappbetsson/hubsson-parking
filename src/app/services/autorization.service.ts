@@ -10,8 +10,8 @@ export class AuthorizationService {
 	async _authorize(secretCode: string): Promise<any> {
 		const secretCodeCollection = this.firebaseService.getSecretCollection();
 		const secretCodeQuery = query(secretCodeCollection, where('secretCode', '==', secretCode));
-		const reservationsSnapshot = await getDocs(secretCodeQuery);
-		return !reservationsSnapshot.empty;
+		const secretCodeSnapshot = await getDocs(secretCodeQuery);
+		return !secretCodeSnapshot.empty;
 	}
 
 	authorize(secretCode: string) {

@@ -28,6 +28,10 @@ export class AuthorizationGuard implements CanActivate {
 			withLatestFrom(this.firebaseService.login$()),
 			map(([, val]) => {
 				return val === true ? true : this.router.parseUrl('');
+			}),
+			catchError((err) => {
+				console.error(err);
+				return fallback$;
 			})
 		);
 	}
