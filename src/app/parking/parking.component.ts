@@ -11,10 +11,10 @@ import { Router } from '@angular/router';
 
 import { Timestamp } from '@firebase/firestore';
 import { merge, Subscription } from 'rxjs';
-import { filter, switchMap, take, tap } from 'rxjs/operators';
+import { filter, take, tap } from 'rxjs/operators';
 import { SECRET_CODE_STORAGE_KEY, SELECTED_USER_STORAGE_KEY } from '../app.consts';
 import { StorageService, StorageType } from '../services/storage.service';
-import { Reservation, ReservationDTO, User } from './../services/db-models';
+import { ReservationDTO, User } from './../services/db-models';
 import { FirebaseService } from './../services/firebase.service';
 
 interface Day {
@@ -22,6 +22,11 @@ interface Day {
 	index: number;
 }
 type DayIndex = number;
+type UserId = string;
+type ParkingSlotId = string;
+type ReservationDayDate = number;
+type UserIdByParkingSlotId = Record<ParkingSlotId, UserId>;
+const NUMBER_OF_DAYS = 10;
 
 @Component({
 	selector: 'hp-parking',
@@ -44,14 +49,14 @@ export class ParkingComponent implements OnInit, OnDestroy {
 		{ name: 'Páva 924', id: '9' },
 	];
 
-	days: Day[] = Array(10).fill(0);
+	days: Day[] = Array(NUMBER_OF_DAYS).fill(0);
 	selectedUser: User;
 
 	@HostBinding('class.hp-parking') hostCss = true;
 
 	private readonly msPerDay = 1000 * 60 * 60 * 24;
-	private newReservations: Record<DayIndex, number> = {};
-	private previousReservations: Reservation[] | undefined;
+	private newReservations: Record<DayIndex, ParkingSlotId> = {};
+	private previousReservations: Record<ReservationDayDate, UserIdByParkingSlotId | undefined> | undefined;
 	private data$$: Subscription | undefined;
 	private users: User[] | undefined;
 
@@ -73,7 +78,13 @@ export class ParkingComponent implements OnInit, OnDestroy {
 
 		const previousReservations$ = this.firebaseService.getPreviousReservations$().pipe(
 			tap((previousReservations) => {
-				this.previousReservations = previousReservations;
+				this.previousReservations = [];
+				previousReservations?.forEach((reservation) => {
+					const reservationDay =
+						this.previousReservations![reservation.day.getDate()] ?? ({} as UserIdByParkingSlotId);
+					reservationDay[reservation.parkingSlot] = reservation.userId;
+					this.previousReservations![reservation.day.getDate()] = reservationDay;
+				});
 			})
 		);
 		const users$ = this.firebaseService.getUsers$().pipe(
@@ -89,43 +100,52 @@ export class ParkingComponent implements OnInit, OnDestroy {
 		this.data$$?.unsubscribe();
 	}
 
-	onTakeParkingSlot(event: Event, day: Day, parkingSlot: number) {
+	onTakeParkingSlot(event: Event, day: Day, parkingSlotId: string) {
 		if (!(event.target as HTMLInputElement)?.checked) {
 			return;
 		}
-		this.newReservations[day.index] = parkingSlot;
+		this.newReservations[day.index] = parkingSlotId;
+	}
+
+	cancelReservation(day: Day, parkingSlotId: string) {
+		const reservation = {
+			userId: this.selectedUser!.id,
+			parkingSlot: parkingSlotId,
+			day: Timestamp.fromDate(day.date),
+		};
+		this.firebaseService.cancelReservation$(reservation);
 	}
 
 	onSave() {
 		const newReservations: ReservationDTO[] = Object.entries(this.newReservations).map(
-			([dayIndex, parkingSlot]) => ({
+			([dayIndex, parkingSlotId]) => ({
 				userId: this.selectedUser!.id,
-				parkingSlot: parkingSlot.toString(),
+				parkingSlot: parkingSlotId,
 				day: Timestamp.fromDate(this.days[+dayIndex].date),
 			})
 		);
 		this.firebaseService.saveReservations$(newReservations);
+		this.newReservations = {};
 	}
 
-	// TODO: use a map instead, it's called a lot
 	isSlotFree(date: Date, parkingSlotId: string): boolean {
-		return !this.previousReservations?.some(
-			(previousReservation) =>
-				previousReservation.parkingSlot === parkingSlotId &&
-				previousReservation.day.getDate() === date.getDate()
-		);
+		return !this.previousReservations?.[date.getDate()]?.[parkingSlotId];
+	}
+
+	private isSelectedUserTheReserver(date: Date, parkingSlotId: string): boolean {
+		return this.previousReservations?.[date.getDate()]?.[parkingSlotId] === this.selectedUser.id;
+	}
+
+	isSlotCancellable(date: Date, parkingSlotId: string): boolean {
+		return !this.isSlotFree(date, parkingSlotId) && this.isSelectedUserTheReserver(date, parkingSlotId);
 	}
 
 	getReserver(date: Date, parkingSlotId: string): string {
-		const reservation = this.previousReservations?.find(
-			(previousReservation) =>
-				previousReservation.parkingSlot === parkingSlotId &&
-				previousReservation.day.getDate() === date.getDate()
-		);
-		if (!reservation) {
+		const reserverId = this.previousReservations?.[date.getDate()]?.[parkingSlotId];
+		if (!reserverId) {
 			return '';
 		}
-		const reserver = this.users?.find((user) => user.id === reservation.userId);
+		const reserver = this.users?.find((user) => user.id === reserverId);
 		if (!reserver) {
 			return '';
 		}

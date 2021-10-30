@@ -15,7 +15,7 @@
 						id="{{ column * 100 + row }}"
 						[attr.name]="'parkingSlotDay' + column"
 						[disabled]="!isSlotFree(day.date, parkingSlot.id)"
-						(change)="onTakeParkingSlot($event, day, row)"
+						(change)="onTakeParkingSlot($event, day, parkingSlot.id)"
 					/>
 					<label
 						class="parking-slot-form-slot-name"
@@ -23,6 +23,12 @@
 						[attr.for]="column * 100 + row"
 						>{{ parkingSlot.name }}</label
 					>
+					<span
+						[ngClass]="{
+							cancellable: isSlotCancellable(day.date, parkingSlot.id)
+						}"
+						(click)="cancelReservation(day, parkingSlot.id)"
+					></span>
 				</div>
 				<span *ngIf="!isSlotFree(day.date, parkingSlot.id)" class="parking-slot-form-slot-reserver">
 					{{ getReserver(day.date, parkingSlot.id) }}

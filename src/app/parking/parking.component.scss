@@ -1,4 +1,5 @@
 .hp-parking {
+	display: flex;
 	color: rgb(215, 211, 241);
 
 	.week-table {
@@ -40,6 +41,19 @@
 
 			&-form-group {
 				line-height: 2.1rem;
+
+				& > * {
+					cursor: pointer;
+				}
+
+				& .cancellable::after {
+					content: "\2716";
+					color: rgba(241, 28, 28, 0.4);
+					display: inline-block;
+					font-size: 1.6rem;
+					margin-left: 3px;
+					vertical-align: bottom;
+				}
 			}
 
 			&-reserver {
@@ -58,6 +72,10 @@
 	.day-head {
 		display: flex;
 		border-bottom: 2px solid gray;
+		background-color: rgb(33, 32, 43);
+		position: sticky;
+		position: -webkit-sticky;
+		top: 0;
 	}
 
 	.day {
