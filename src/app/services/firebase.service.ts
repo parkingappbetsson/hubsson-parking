@@ -42,7 +42,6 @@ export class FirebaseService {
 	private readonly db: Firestore;
 	private readonly auth: Auth;
 
-	private users: User[];
 	private users$: BehaviorSubject<User[] | undefined>;
 	private reservations: Reservation[];
 	private reservations$: BehaviorSubject<Reservation[] | undefined>;
@@ -59,25 +58,37 @@ export class FirebaseService {
 		}
 		this.users$ = new BehaviorSubject<User[] | undefined>(undefined);
 		this.reservations$ = new BehaviorSubject<Reservation[] | undefined>(undefined);
-		this.users = [];
 		this.reservations = [];
 	}
 
-	private async _getUsers(): Promise<void> {
+	private async _getUsers(): Promise<User[]> {
 		const querySnapshot = await getDocs(collection(this.db, USERS_COLLECTION));
 		const users: User[] = [];
 		querySnapshot.forEach((doc) => {
 			const data = doc.data();
 			users.push(data as User);
 		});
-		this.users = users;
-		this.users$.next(this.users);
+		return users;
 	}
 
-	private async _saveUser(newUser: User): Promise<void> {
+	private async _updateUsers(): Promise<void> {
+		const users = await this._getUsers();
+		this.users$.next(users);
+	}
+
+	private async _createUser(name: string, plate: string): Promise<User> {
+		const users = await this._getUsers();
+		const maxId = users?.reduce((accumulator, user) => Math.max(accumulator, Number(user.id)), 0) ?? 0;
+		const newId = maxId + Math.floor(Math.random() * 3);
+		const newUser: User = {
+			name,
+			plate,
+			id: newId.toString(),
+		};
 		addDoc(collection(this.db, USERS_COLLECTION), newUser);
-		this.users.push(newUser);
-		this.users$.next(this.users);
+		users.push(newUser);
+		this.users$.next(users);
+		return newUser;
 	}
 
 	private async _saveReservations(newReservations: ReservationDTO[]): Promise<boolean> {
@@ -168,12 +179,12 @@ export class FirebaseService {
 	}
 
 	getUsers$(): Observable<User[] | undefined> {
-		this._getUsers();
+		this._updateUsers();
 		return this.users$.asObservable();
 	}
 
-	saveUser$(newUser: User): Observable<void> {
-		return from(this._saveUser(newUser));
+	createUser$(name: string, plate: string): Observable<User> {
+		return from(this._createUser(name, plate));
 	}
 
 	saveReservations$(reservations: ReservationDTO[]): Observable<boolean> {

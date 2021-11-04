@@ -47,32 +47,23 @@ export class UserChooserComponent implements OnInit, OnDestroy {
 	}
 
 	selectUserAndGo() {
-		let user: User;
 		if (this.isCreatingNewUser) {
-			user = this.createUser();
-			this.saveNewUser(user);
+			this.firebaseService
+				.createUser$(this.name!, this.plate!)
+				.subscribe((user) => this.navigateToParkingWithUser(user));
+			return;
 		} else {
-			user = this.users!.find((user) => user.id === this.selectedUserId)!;
 		}
-		StorageService.setForKey(SELECTED_USER_STORAGE_KEY, user, StorageType.Local);
-		this.router.navigate(['parking']);
+		const user = this.users!.find((user) => user.id === this.selectedUserId)!;
+		this.navigateToParkingWithUser(user);
 	}
 
 	switchToCreate() {
 		this.isCreatingNewUser = true;
 	}
 
-	private createUser(): User {
-		let maxId = this.users?.reduce((accumulator, user) => Math.max(accumulator, Number(user.id)), 0) ?? 0;
-		const newUser: User = {
-			name: this.name!,
-			plate: this.plate!,
-			id: (++maxId).toString(),
-		};
-		return newUser;
-	}
-
-	private saveNewUser(user: User) {
-		this.firebaseService.saveUser$(user);
+	private navigateToParkingWithUser(user: User) {
+		StorageService.setForKey(SELECTED_USER_STORAGE_KEY, user, StorageType.Local);
+		this.router.navigate(['parking']);
 	}
 }
