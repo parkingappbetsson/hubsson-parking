@@ -38,7 +38,7 @@ export class UserChooserComponent implements OnInit, OnDestroy {
 	ngOnInit() {
 		this.users$$ = this.firebaseService
 			.getUsers$()
-			.pipe(tap((users) => (this.users = users)))
+			.pipe(tap((users) => (this.users = users?.sort())))
 			.subscribe(() => this.cdRef.markForCheck());
 	}
 
