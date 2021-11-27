@@ -1,4 +1,6 @@
 @use "@angular/material" as mat;
+@use "./app/parking/parking.theme" as parking-theme;
+
 /* You can add global styles to this file, and also import other style files */
 html,
 body {
@@ -49,3 +51,4 @@ $form-field-theme: mat.define-dark-theme(
 
 @include mat.all-component-themes($default-theme);
 @include mat.form-field-theme($form-field-theme);
+@include parking-theme.hp-parking-theme($default-theme);

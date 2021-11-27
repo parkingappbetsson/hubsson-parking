@@ -50,6 +50,7 @@ export class ParkingComponent implements OnInit, OnDestroy {
 	];
 
 	days: Day[] = Array(NUMBER_OF_DAYS).fill(0);
+	chosenDayIndex = 0;
 	selectedUser: User;
 
 	@HostBinding('class.hp-parking') hostCss = true;
@@ -98,6 +99,10 @@ export class ParkingComponent implements OnInit, OnDestroy {
 
 	ngOnDestroy() {
 		this.data$$?.unsubscribe();
+	}
+
+	chooseDay(dayIndex: number) {
+		this.chosenDayIndex = dayIndex;
 	}
 
 	onTakeParkingSlot(event: Event, day: Day, parkingSlotId: string) {

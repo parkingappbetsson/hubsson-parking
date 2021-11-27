@@ -1,12 +1,28 @@
 <div class="week-table">
-	<div class="day-head">
-		<div *ngFor="let day of days" class="day">
-			<h2>
-				{{ day.date | date: "EEEE, MMMM d" }}
-			</h2>
-		</div>
+	<div class="hp-parking-day-head">
+		<mat-card
+			*ngFor="let day of days; index as dayIndex"
+			class="hp-parking-day-card"
+			[class.active]="chosenDayIndex === dayIndex"
+			(click)="chooseDay(dayIndex)"
+		>
+			<mat-card-content>
+				<p>
+					{{ day.date | date: "EEEE, MM.d" }}
+				</p>
+			</mat-card-content>
+		</mat-card>
 	</div>
-	<form class="parking-slot-form">
+	<div class="hp-parking-parking-slot">
+		<mat-card *ngFor="let parkingSlot of parkingSlots">
+			<mat-card-content>
+				<p>
+					{{ parkingSlot.name }}
+				</p>
+			</mat-card-content>
+		</mat-card>
+	</div>
+	<!-- <form class="parking-slot-form">
 		<div *ngFor="let day of days; index as column" class="day">
 			<div *ngFor="let parkingSlot of parkingSlots; index as row" class="parking-slot-form-slot">
 				<div class="parking-slot-form-slot-form-group">
@@ -35,7 +51,7 @@
 				</span>
 			</div>
 		</div>
-	</form>
+	</form> -->
 	<div class="submit-group">
 		<button (click)="onSave()" [disabled]="isSaveDisabled()">Save</button>
 		<p>
