@@ -1,17 +1,26 @@
-<h2>Choose user or switch to new user creation</h2>
+<h2>Choose a user or add a new one</h2>
 <ng-container *ngIf="!isCreatingNewUser; else createNewUser">
-	<select class="user-chooser-users" [(ngModel)]="selectedUserId">
-		<option value=""></option>
-		<option *ngFor="let user of users" value="{{ user.id }}">{{ user.name }} - {{ user.plate }}</option>
-	</select>
-	<button *ngIf="selectedUserId" (click)="selectUserAndGo()" [disabled]="!selectedUserId">Enter</button>
-	<button *ngIf="!selectedUserId" (click)="switchToCreate()">Switch</button>
+	<mat-form-field appearance="fill" floatLabel="never">
+		<select matNativeControl class="hp-user-chooser-users" [(ngModel)]="selectedUserId">
+			<option value=""></option>
+			<option *ngFor="let user of users" value="{{ user.id }}">{{ user.name }} - {{ user.plate }}</option>
+		</select>
+	</mat-form-field>
+	<button (click)="selectUserAndGo()" [disabled]="!selectedUserId" mat-raised-button color="primary">Choose</button>
+	<button (click)="switchToCreateAndBack()" mat-raised-button color="primary">Add user</button>
 </ng-container>
 
 <ng-template #createNewUser>
-	<label>Name</label>
-	<input [(ngModel)]="name" (keyup.enter)="selectUserAndGo()" required />
-	<label>Plate number</label>
-	<input [(ngModel)]="plate" (keyup.enter)="selectUserAndGo()" required />
-	<button (click)="selectUserAndGo()">Enter</button>
+	<mat-form-field appearance="fill">
+		<mat-label>Name</mat-label>
+		<input [(ngModel)]="name" (keyup.enter)="selectUserAndGo()" required matInput />
+	</mat-form-field>
+	<mat-form-field appearance="fill">
+		<mat-label>Plate number</mat-label>
+		<input [(ngModel)]="plate" (keyup.enter)="selectUserAndGo()" required matInput />
+	</mat-form-field>
+	<button (click)="selectUserAndGo()" mat-raised-button color="primary" [disabled]="!name || !plate">
+		Add and login
+	</button>
+	<button (click)="switchToCreateAndBack()" mat-raised-button color="primary">Choose user</button>
 </ng-template>
