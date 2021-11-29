@@ -1,21 +1,23 @@
 .hp-parking {
 	display: flex;
-	color: rgb(215, 211, 241);
-
-	.week-table {
-		display: flex;
-		flex-direction: column;
-		margin: 24px;
-		overflow-x: hidden;
-	}
+	flex-direction: column;
+	overflow: hidden;
+	height: 100%;
 
 	&-day-head {
 		display: flex;
 		flex-direction: row;
-		position: sticky;
-		position: -webkit-sticky;
-		top: 0;
+		align-items: center;
+		height: 146px;
+		padding: 0 5px;
 		overflow-x: scroll;
+		border-bottom: 1px solid rgba(255, 255, 255, 0.7);
+	}
+
+	&-content {
+		overflow-y: auto;
+		margin: 0 16px;
+		padding-bottom: 24px;
 	}
 
 	& &-day-card {
@@ -29,10 +31,36 @@
 		align-items: center;
 		text-align: center;
 		margin-right: 8px;
+		margin-left: auto;
+		cursor: pointer;
 	}
 
-	&-parking-slot {
+	&-parking-slots {
 		margin-top: 16px;
+		display: flex;
+		flex-wrap: wrap;
+		justify-content: space-evenly;
+	}
+
+	&-parking-slot-card {
+		margin: 0 10px 10px 0;
+		min-width: 120px;
+		max-width: 120px;
+		min-height: 50px;
+		max-height: 50px;
+
+		&.taken {
+			cursor: default;
+			mat-card-subtitle {
+				display: -webkit-box;
+				-webkit-line-clamp: 2;
+				-webkit-box-orient: vertical;
+			}
+			&:not(.cancellable) {
+				pointer-events: none;
+				color: rgba(255, 255, 255, 0.7);
+			}
+		}
 	}
 
 	.submit-group {
@@ -44,18 +72,38 @@
 			margin-left: 12px;
 			font-size: 1.2rem;
 		}
-	}
-
-	button {
-		width: fit-content;
-		font-size: 1.6rem;
-		margin-bottom: 10px;
+		button {
+			width: fit-content;
+			font-size: 1.6rem;
+			margin-bottom: 10px;
+		}
 	}
 
 	@media (min-width: 768px) {
+		margin: 0 24px;
+
 		.parking-slot-form-slot-form-group {
 			font-size: 1.2rem;
 			line-height: 2rem;
+		}
+
+		& &-parking-slot-card {
+			display: flex;
+			flex-direction: column;
+			justify-content: center;
+			min-width: 200px;
+			max-width: 200px;
+			min-height: 100px;
+			max-height: 100px;
+			cursor: pointer;
+
+			&.taken:not(.cancellable) {
+				cursor: default;
+			}
+		}
+
+		&-day-head {
+			height: 120px;
 		}
 	}
 }
