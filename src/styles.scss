@@ -1,8 +1,7 @@
-/* You can add global styles to this file, and also import other style files */
-html {
-	background-color: rgb(33, 32, 43);
-}
+@use "@angular/material" as mat;
+@use "./app/parking/parking.component.theme" as parking-theme;
 
+/* You can add global styles to this file, and also import other style files */
 html,
 body {
 	height: 100%;
@@ -13,32 +12,43 @@ body {
 }
 
 button {
-	color: #fff;
-	background-color: #343a40;
-	border-color: #343a40;
 	padding: 10px;
-
-	&:focus {
-		box-shadow: 0 0 0 0.2rem rgb(52 58 64 / 50%);
-	}
 
 	&:not(:disabled):not(.disabled) {
 		cursor: pointer;
-		&:active {
-			color: #fff;
-			background-color: #1d2124;
-			border-color: #171a1d;
-		}
-	}
-
-	&:hover {
-		color: #fff;
-		background-color: #23272b;
-		border-color: #1d2124;
-	}
-
-	&.disabled,
-	&:disabled {
-		opacity: 0.65;
 	}
 }
+
+body {
+	margin: 0;
+	font-family: Roboto, "Helvetica Neue", sans-serif;
+}
+
+@include mat.core();
+
+$primary: mat.define-palette(mat.$blue-palette, 900);
+$accent: mat.define-palette(mat.$blue-gray-palette, 800);
+
+$default-theme: mat.define-dark-theme(
+	(
+		color: (
+			primary: $primary,
+			accent: $accent,
+		),
+	)
+);
+
+$form-field-primary: mat.define-palette(mat.$blue-palette, 500);
+$form-field-accent: mat.define-palette(mat.$blue-gray-palette, 400);
+$form-field-theme: mat.define-dark-theme(
+	(
+		color: (
+			primary: $form-field-primary,
+			accent: $form-field-accent,
+		),
+	)
+);
+
+@include mat.all-component-themes($default-theme);
+@include mat.form-field-theme($form-field-theme);
+@include parking-theme.hp-parking-theme($default-theme);

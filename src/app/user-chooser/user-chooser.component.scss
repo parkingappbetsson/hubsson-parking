@@ -1,12 +1,15 @@
 .hp-user-chooser {
 	display: flex;
-	color: rgb(215, 211, 241);
 	flex-direction: column;
 	align-items: center;
 	justify-content: center;
 	height: 100%;
 
-	& > * {
+	h2,
+	select,
+	input,
+	button,
+	label {
 		margin-top: 10px;
 	}
 
@@ -26,5 +29,20 @@
 
 	label {
 		font-size: 1.1rem;
+	}
+
+	& &-users {
+		padding-top: 0;
+	}
+
+	mat-form-field {
+		width: 70%;
+		max-width: 320px;
+	}
+
+	@media (min-width: 768px) {
+		mat-form-field {
+			width: 50%;
+		}
 	}
 }

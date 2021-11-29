@@ -1,0 +1,19 @@
+@use "sass:map";
+@use "@angular/material" as mat;
+
+@mixin hp-parking-theme($theme) {
+	$color-config: mat.get-color-config($theme);
+
+	$primary-palette: map.get($color-config, "primary");
+
+	.hp-parking {
+		&-day-card.active,
+		&-parking-slot-card.cancellable {
+			background-color: mat.get-color-from-palette($primary-palette, 500);
+		}
+
+		&-parking-slot-card.pending {
+			background-color: mat.get-color-from-palette($primary-palette, 900);
+		}
+	}
+}

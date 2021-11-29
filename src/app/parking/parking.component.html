@@ -1,46 +1,52 @@
-<div class="week-table">
-	<div class="day-head">
-		<div *ngFor="let day of days" class="day">
-			<h2>
-				{{ day.date | date: "EEEE, MMMM d" }}
-			</h2>
-		</div>
+<div class="hp-parking-day-head">
+	<mat-card
+		*ngFor="let day of days; index as dayIndex"
+		class="hp-parking-day-card"
+		[class.active]="chosenDayIndex === dayIndex"
+		(click)="chooseDay(dayIndex)"
+	>
+		<mat-card-content>
+			<p>
+				{{ day.date | date: "EEEE, MM.d" }}
+			</p>
+		</mat-card-content>
+	</mat-card>
+</div>
+<div class="hp-parking-content">
+	<div class="hp-parking-parking-slots">
+		<ng-container *ngFor="let parkingSlot of parkingSlots">
+			<mat-card
+				*ngIf="isSlotFree(parkingSlot.id); else slotTaken"
+				class="hp-parking-parking-slot-card"
+				[ngClass]="{
+					pending: isSlotPending(parkingSlot.id)
+				}"
+				(click)="takeParkingSlot(parkingSlot.id)"
+			>
+				<mat-card-title>{{ parkingSlot.name }}</mat-card-title>
+			</mat-card>
+			<ng-template #slotTaken>
+				<mat-card
+					[ngClass]="{
+						cancellable: isSlotCancellable(parkingSlot.id),
+						pending: isSlotPending(parkingSlot.id)
+					}"
+					class="hp-parking-parking-slot-card taken"
+					(click)="cancelReservation(parkingSlot.id)"
+				>
+					<mat-card-title>{{ parkingSlot.name }}</mat-card-title>
+					<mat-card-subtitle>
+						{{ getReserverText(parkingSlot.id) }}
+					</mat-card-subtitle>
+				</mat-card>
+			</ng-template>
+		</ng-container>
 	</div>
-	<form class="parking-slot-form">
-		<div *ngFor="let day of days; index as column" class="day">
-			<div *ngFor="let parkingSlot of parkingSlots; index as row" class="parking-slot-form-slot">
-				<div class="parking-slot-form-slot-form-group">
-					<input
-						type="radio"
-						id="{{ column * 100 + row }}"
-						[attr.name]="'parkingSlotDay' + column"
-						[disabled]="!isSlotFree(day.date, parkingSlot.id)"
-						(change)="onTakeParkingSlot($event, day, parkingSlot.id)"
-					/>
-					<label
-						class="parking-slot-form-slot-name"
-						[ngClass]="{ free: isSlotFree(day.date, parkingSlot.id) }"
-						[attr.for]="column * 100 + row"
-						>{{ parkingSlot.name }}</label
-					>
-					<span
-						[ngClass]="{
-							cancellable: isSlotCancellable(day.date, parkingSlot.id)
-						}"
-						(click)="cancelReservation(day, parkingSlot.id)"
-					></span>
-				</div>
-				<span *ngIf="!isSlotFree(day.date, parkingSlot.id)" class="parking-slot-form-slot-reserver">
-					{{ getReserver(day.date, parkingSlot.id) }}
-				</span>
-			</div>
-		</div>
-	</form>
-	<div class="submit-group">
-		<button (click)="onSave()" [disabled]="isSaveDisabled()">Save</button>
-		<p>
+	<div class="hp-parking-submit-group">
+		<button (click)="onSave()" [disabled]="isSaveDisabled()" mat-raised-button color="primary">Save</button>
+		<span>
 			Saving as <b>{{ selectedUser.name }} {{ selectedUser.plate }}</b>
-		</p>
+		</span>
 	</div>
-	<button (click)="clearUser()">Logout</button>
+	<button (click)="clearUser()" class="hp-parking-logout" mat-raised-button color="accent">Logout</button>
 </div>

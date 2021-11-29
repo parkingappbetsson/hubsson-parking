@@ -1,119 +1,107 @@
 .hp-parking {
 	display: flex;
-	color: rgb(215, 211, 241);
+	flex-direction: column;
+	overflow: hidden;
+	height: 100%;
 
-	.week-table {
+	&-day-head {
 		display: flex;
-		flex-direction: column;
-		margin: 24px;
+		flex-direction: row;
+		align-items: center;
+		height: 146px;
+		padding: 0 5px;
+		overflow-x: scroll;
+		border-bottom: 1px solid rgba(255, 255, 255, 0.7);
 	}
 
-	.parking-slot-form {
-		display: flex;
-
-		&-slot {
-			display: flex;
-			flex-direction: column;
-			font-size: 1.4rem;
-			height: 3.6rem;
-			align-items: baseline;
-			min-width: inherit;
-			max-width: inherit;
-			margin-bottom: 5px;
-
-			&-name.free::after {
-				content: "|";
-				color: rgba(144, 238, 144, 0.4);
-				display: inline-block;
-				font-size: 1.6rem;
-				margin-left: 3px;
-				vertical-align: bottom;
-			}
-
-			&-name:not(.free)::after {
-				content: "|";
-				color: rgba(241, 28, 28, 0.4);
-				display: inline-block;
-				font-size: 1.6rem;
-				margin-left: 3px;
-				vertical-align: bottom;
-			}
-
-			&-form-group {
-				line-height: 2.1rem;
-
-				& > * {
-					cursor: pointer;
-				}
-
-				& .cancellable::after {
-					content: "\2716";
-					color: rgba(241, 28, 28, 0.4);
-					display: inline-block;
-					font-size: 1.6rem;
-					margin-left: 3px;
-					vertical-align: bottom;
-				}
-			}
-
-			&-reserver {
-				font-size: 0.7rem;
-				line-height: 0.8rem;
-				padding-left: 18px;
-				text-align: left;
-			}
-		}
-
-		.day {
-			align-items: flex-start;
-		}
+	&-content {
+		overflow-y: auto;
+		margin: 0 16px;
+		padding-bottom: 24px;
 	}
 
-	.day-head {
+	& &-day-card {
+		min-width: 64px;
+		max-width: 64px;
+		min-height: 64px;
+		max-height: 64px;
+		border-radius: 50%;
 		display: flex;
-		border-bottom: 2px solid gray;
-		background-color: rgb(33, 32, 43);
-		position: sticky;
-		position: -webkit-sticky;
-		top: 0;
-	}
-
-	.day {
-		display: flex;
-		flex-direction: column;
-		border-right: 2px solid gray;
-		min-width: 150px;
-		max-width: 150px;
+		justify-content: center;
 		align-items: center;
 		text-align: center;
+		margin-right: 8px;
+		margin-left: auto;
+		cursor: pointer;
 	}
 
-	.submit-group {
+	&-parking-slots {
+		margin-top: 16px;
 		display: flex;
-		align-items: center;
-		margin: 15px 0;
+		flex-wrap: wrap;
+		justify-content: space-evenly;
+	}
 
-		p {
-			margin-left: 12px;
-			font-size: 1.2rem;
+	&-parking-slot-card {
+		margin: 0 10px 10px 0;
+		min-width: 120px;
+		max-width: 120px;
+		min-height: 50px;
+		max-height: 50px;
+
+		&.taken {
+			cursor: default;
+			mat-card-subtitle {
+				display: -webkit-box;
+				-webkit-line-clamp: 2;
+				-webkit-box-orient: vertical;
+			}
+			&:not(.cancellable) {
+				pointer-events: none;
+				color: rgba(255, 255, 255, 0.7);
+			}
 		}
 	}
 
-	button {
-		width: fit-content;
-		font-size: 1.6rem;
-		margin-bottom: 10px;
+	&-submit-group {
+		display: flex;
+		align-items: center;
+		justify-content: flex-start;
+		font-size: 16px;
+
+		button {
+			font-size: 20px;
+			line-height: 2.2;
+			margin-right: 8px;
+		}
+	}
+
+	& &-logout {
+		margin-top: 16px;
+		margin-right: 8px;
+		float: right;
 	}
 
 	@media (min-width: 768px) {
-		.day {
-			min-width: 140px;
-			max-width: 140px;
+		margin: 0 24px;
+
+		& &-parking-slot-card {
+			display: flex;
+			flex-direction: column;
+			justify-content: center;
+			min-width: 180px;
+			max-width: 180px;
+			min-height: 75px;
+			max-height: 75px;
+			cursor: pointer;
+
+			&.taken:not(.cancellable) {
+				cursor: default;
+			}
 		}
 
-		.parking-slot-form-slot-form-group {
-			font-size: 1.2rem;
-			line-height: 2rem;
+		&-day-head {
+			height: 120px;
 		}
 	}
 }

@@ -71,8 +71,8 @@ export class UserChooserComponent implements OnInit, OnDestroy {
 		this.navigateToParkingWithUser(user);
 	}
 
-	switchToCreate() {
-		this.isCreatingNewUser = true;
+	switchToCreateAndBack() {
+		this.isCreatingNewUser = !this.isCreatingNewUser;
 	}
 
 	private navigateToParkingWithUser(user: User) {
