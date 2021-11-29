@@ -80,9 +80,10 @@ export class ParkingComponent implements OnInit, OnDestroy {
 		const previousReservations$ = this.firebaseService.getPreviousReservations$().pipe(
 			tap((previousReservations) => {
 				this.previousReservations = [];
-				for(let previousReservation of previousReservations ?? []) {
+				for (let previousReservation of previousReservations ?? []) {
 					const reservationDate = previousReservation.day.getDate();
-					const parkingSlotsAndUsersReservingThem = this.previousReservations[reservationDate] ?? ({} as UserIdByParkingSlotId);
+					const parkingSlotsAndUsersReservingThem =
+						this.previousReservations[reservationDate] ?? ({} as UserIdByParkingSlotId);
 					parkingSlotsAndUsersReservingThem[previousReservation.parkingSlot] = previousReservation.userId;
 					this.previousReservations![reservationDate] = parkingSlotsAndUsersReservingThem;
 				}
@@ -106,7 +107,7 @@ export class ParkingComponent implements OnInit, OnDestroy {
 	}
 
 	takeParkingSlot(parkingSlotId: string) {
-		if(this.newReservations[this.chosenDayIndex]){
+		if (this.newReservations[this.chosenDayIndex] === parkingSlotId) {
 			delete this.newReservations[this.chosenDayIndex];
 			return;
 		}
@@ -114,13 +115,6 @@ export class ParkingComponent implements OnInit, OnDestroy {
 	}
 
 	cancelReservation(parkingSlotId: string) {
-		// const chosenDate = this.days[this.chosenDayIndex].date;
-		// const reservation = {
-		// 	userId: this.selectedUser!.id,
-		// 	parkingSlot: parkingSlotId,
-		// 	day: Timestamp.fromDate(chosenDate),
-		// };
-		// this.firebaseService.cancelReservation$(reservation);
 		this.takeParkingSlot(parkingSlotId);
 	}
 

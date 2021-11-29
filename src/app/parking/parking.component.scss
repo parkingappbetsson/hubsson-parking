@@ -63,38 +63,36 @@
 		}
 	}
 
-	.submit-group {
+	&-submit-group {
 		display: flex;
 		align-items: center;
-		margin: 15px 0;
+		justify-content: flex-start;
+		font-size: 16px;
 
-		p {
-			margin-left: 12px;
-			font-size: 1.2rem;
-		}
 		button {
-			width: fit-content;
-			font-size: 1.6rem;
-			margin-bottom: 10px;
+			font-size: 20px;
+			line-height: 2.2;
+			margin-right: 8px;
 		}
+	}
+
+	& &-logout {
+		margin-top: 16px;
+		margin-right: 8px;
+		float: right;
 	}
 
 	@media (min-width: 768px) {
 		margin: 0 24px;
 
-		.parking-slot-form-slot-form-group {
-			font-size: 1.2rem;
-			line-height: 2rem;
-		}
-
 		& &-parking-slot-card {
 			display: flex;
 			flex-direction: column;
 			justify-content: center;
-			min-width: 200px;
-			max-width: 200px;
-			min-height: 100px;
-			max-height: 100px;
+			min-width: 180px;
+			max-width: 180px;
+			min-height: 75px;
+			max-height: 75px;
 			cursor: pointer;
 
 			&.taken:not(.cancellable) {

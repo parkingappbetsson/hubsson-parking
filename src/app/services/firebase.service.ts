@@ -161,25 +161,6 @@ export class FirebaseService {
 		}
 	}
 
-	private async _cancelReservation(reservationToCancel: ReservationDTO): Promise<void> {
-		const reservationCollection = collection(this.db, RESERVATIONS_COLLECTION);
-		const reservationQuery = query(
-			reservationCollection,
-			where('day', '==', reservationToCancel.day),
-			where('userId', '==', reservationToCancel.userId)
-		);
-		const reservationDoc = await getDocs(reservationQuery);
-		await deleteDoc(reservationDoc.docs[0].ref);
-
-		const cancellationIndex = this.reservations.findIndex(
-			(reservation) =>
-				reservation.day.getDate() === reservationToCancel.day.toDate().getDate() &&
-				reservation.userId === reservationToCancel.userId
-		);
-		this.reservations.splice(cancellationIndex, 1);
-		this.reservations$.next([...this.reservations]);
-	}
-
 	getUsers$(): Observable<User[] | undefined> {
 		this._updateUsers();
 		return this.users$.asObservable();
@@ -204,9 +185,5 @@ export class FirebaseService {
 
 	getSecretCollection(): CollectionReference<DocumentData> {
 		return collection(this.db, SECRET_CODE_COLLECTION);
-	}
-
-	cancelReservation$(reservation: ReservationDTO): Observable<void> {
-		return from(this._cancelReservation(reservation));
 	}
 }
