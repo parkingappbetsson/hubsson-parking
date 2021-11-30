@@ -13,6 +13,7 @@ import { MatInputModule } from '@angular/material/input';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatSelectModule } from '@angular/material/select';
 import { MatCardModule } from '@angular/material/card';
+import { MatBadgeModule } from '@angular/material/badge';
 
 @NgModule({
 	declarations: [AppComponent, ParkingComponent, SecretCodeComponent, UserChooserComponent],
@@ -26,6 +27,7 @@ import { MatCardModule } from '@angular/material/card';
 		MatFormFieldModule,
 		MatSelectModule,
 		MatCardModule,
+		MatBadgeModule,
 	],
 	providers: [],
 	bootstrap: [AppComponent],

@@ -33,6 +33,11 @@
 		margin-right: 8px;
 		margin-left: auto;
 		cursor: pointer;
+
+		.mat-badge-content {
+			right: 0 !important;
+			top: 0;
+		}
 	}
 
 	&-parking-slots {

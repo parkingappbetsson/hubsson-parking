@@ -3,6 +3,8 @@
 		*ngFor="let day of days; index as dayIndex"
 		class="hp-parking-day-card"
 		[class.active]="chosenDayIndex === dayIndex"
+		[matBadge]="getFreeSlotNumberForDay(day)"
+		matBadgeColor="accent"
 		(click)="chooseDay(dayIndex)"
 	>
 		<mat-card-content>

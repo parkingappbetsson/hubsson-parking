@@ -160,6 +160,10 @@ export class ParkingComponent implements OnInit, OnDestroy {
 		this.router.navigate(['']);
 	}
 
+	getFreeSlotNumberForDay(day: Day): number {
+		return this.parkingSlots.length - Object.keys(this.previousReservations?.[day.date.getDate()] ?? {}).length;
+	}
+
 	private isSelectedUserTheReserver(parkingSlotId: string): boolean {
 		return this.getReserverId(parkingSlotId) === this.selectedUser.id;
 	}
