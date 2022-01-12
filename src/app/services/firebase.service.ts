@@ -77,7 +77,7 @@ export class FirebaseService {
 	private async _createUser(name: string, plate: string): Promise<User> {
 		const users = await this._getUsers();
 		const maxId = users?.reduce((accumulator, user) => Math.max(accumulator, Number(user.id)), 0) ?? 0;
-		const newId = maxId + Math.floor(Math.random() * 3);
+		const newId = maxId + Math.floor(Math.random() * 3) + 1;
 		const newUser: User = {
 			name,
 			plate,
@@ -106,9 +106,9 @@ export class FirebaseService {
 					where('userId', '==', reservationChange.userId)
 				);
 				const reservationDoc = await getDocs(reservationQuery);
-				if(reservationChange.parkingSlot === this.reservations[updateIndex].parkingSlot) {
+				if (reservationChange.parkingSlot === this.reservations[updateIndex].parkingSlot) {
 					batch.delete(reservationDoc.docs[0].ref);
-					this.reservations.splice(updateIndex,1);
+					this.reservations.splice(updateIndex, 1);
 				} else {
 					batch.update(reservationDoc.docs[0].ref, { parkingSlot: reservationChange.parkingSlot });
 					this.reservations[updateIndex].parkingSlot = reservationChange.parkingSlot;

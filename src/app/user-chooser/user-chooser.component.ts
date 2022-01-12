@@ -10,7 +10,7 @@ import {
 import { Router } from '@angular/router';
 import { Subscription } from 'rxjs';
 import { tap } from 'rxjs/operators';
-import { SELECTED_USER_STORAGE_KEY } from '../app.consts';
+import { PREVIOUS_USER_STORAGE_KEY, SELECTED_USER_STORAGE_KEY } from '../app.consts';
 import { FirebaseService } from '../services/firebase.service';
 import { StorageService, StorageType } from '../services/storage.service';
 import { User } from './../services/db-models';
@@ -33,7 +33,9 @@ export class UserChooserComponent implements OnInit, OnDestroy {
 
 	private users$$: Subscription | undefined;
 
-	constructor(private router: Router, private firebaseService: FirebaseService, private cdRef: ChangeDetectorRef) {}
+	constructor(private router: Router, private firebaseService: FirebaseService, private cdRef: ChangeDetectorRef) {
+		this.selectedUserId = StorageService.getForKey(PREVIOUS_USER_STORAGE_KEY, StorageType.Local)?.id;
+	}
 
 	ngOnInit() {
 		this.users$$ = this.firebaseService

@@ -12,7 +12,7 @@ import { Router } from '@angular/router';
 import { Timestamp } from '@firebase/firestore';
 import { merge, Subscription } from 'rxjs';
 import { filter, take, tap } from 'rxjs/operators';
-import { SECRET_CODE_STORAGE_KEY, SELECTED_USER_STORAGE_KEY } from '../app.consts';
+import { PREVIOUS_USER_STORAGE_KEY, SECRET_CODE_STORAGE_KEY, SELECTED_USER_STORAGE_KEY } from '../app.consts';
 import { StorageService, StorageType } from '../services/storage.service';
 import { ReservationDTO, User } from './../services/db-models';
 import { FirebaseService } from './../services/firebase.service';
@@ -157,6 +157,7 @@ export class ParkingComponent implements OnInit, OnDestroy {
 	clearUser() {
 		StorageService.remove(SELECTED_USER_STORAGE_KEY, StorageType.Local);
 		StorageService.remove(SECRET_CODE_STORAGE_KEY, StorageType.Local);
+		StorageService.setForKey(PREVIOUS_USER_STORAGE_KEY, this.selectedUser, StorageType.Local);
 		this.router.navigate(['']);
 	}
 
