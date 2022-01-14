@@ -13,6 +13,8 @@ export class SecretCodeComponent implements OnInit {
 	@HostBinding('class.hp-secret-code') hostCss = true;
 	secretCode: string | undefined;
 
+	busy = true;
+
 	constructor(private router: Router) {}
 
 	ngOnInit() {
@@ -20,7 +22,9 @@ export class SecretCodeComponent implements OnInit {
 		const selectedUser = StorageService.getForKey(SELECTED_USER_STORAGE_KEY, StorageType.Local);
 		if (secretCode && selectedUser) {
 			this.router.navigate(['parking']);
+			return;
 		}
+		this.busy = false;
 	}
 
 	setSecretAndGo() {

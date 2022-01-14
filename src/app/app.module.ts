@@ -7,13 +7,14 @@ import { AppComponent } from './app.component';
 import { ParkingComponent } from './parking/parking.component';
 import { SecretCodeComponent } from './secret-code/secret-code.component';
 import { UserChooserComponent } from './user-chooser/user-chooser.component';
-import { NoopAnimationsModule } from '@angular/platform-browser/animations';
 import { MatButtonModule } from '@angular/material/button';
 import { MatInputModule } from '@angular/material/input';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatSelectModule } from '@angular/material/select';
 import { MatCardModule } from '@angular/material/card';
 import { MatBadgeModule } from '@angular/material/badge';
+import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
+import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 
 @NgModule({
 	declarations: [AppComponent, ParkingComponent, SecretCodeComponent, UserChooserComponent],
@@ -21,13 +22,14 @@ import { MatBadgeModule } from '@angular/material/badge';
 		BrowserModule,
 		AppRoutingModule,
 		FormsModule,
-		NoopAnimationsModule,
+		BrowserAnimationsModule,
 		MatButtonModule,
 		MatInputModule,
 		MatFormFieldModule,
 		MatSelectModule,
 		MatCardModule,
 		MatBadgeModule,
+		MatProgressSpinnerModule,
 	],
 	providers: [],
 	bootstrap: [AppComponent],
