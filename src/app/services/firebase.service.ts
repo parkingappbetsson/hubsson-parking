@@ -40,7 +40,7 @@ export class FirebaseService {
 	private readonly db: Firestore;
 	private readonly auth: Auth;
 
-	private users$: BehaviorSubject<User[] | undefined>;
+	private users$: BehaviorSubject<User[] | undefined> | undefined;
 	private reservations: Reservation[];
 	private reservations$: BehaviorSubject<Reservation[] | undefined>;
 
@@ -54,7 +54,6 @@ export class FirebaseService {
 			connectFirestoreEmulator(this.db, 'localhost', 8080);
 			connectAuthEmulator(this.auth, 'http://localhost:9099');
 		}
-		this.users$ = new BehaviorSubject<User[] | undefined>(undefined);
 		this.reservations$ = new BehaviorSubject<Reservation[] | undefined>(undefined);
 		this.reservations = [];
 	}
@@ -69,7 +68,11 @@ export class FirebaseService {
 		return users;
 	}
 
-	private async _updateUsers(): Promise<void> {
+	private async _getUsersOnce(): Promise<void> {
+		if (this.users$) {
+			return;
+		}
+		this.users$ = new BehaviorSubject<User[] | undefined>(undefined);
 		const users = await this._getUsers();
 		this.users$.next(users);
 	}
@@ -85,7 +88,11 @@ export class FirebaseService {
 		};
 		addDoc(collection(this.db, USERS_COLLECTION), newUser);
 		users.push(newUser);
-		this.users$.next(users);
+		if (!this.users$) {
+			this.users$ = new BehaviorSubject<User[] | undefined>(users);
+		} else {
+			this.users$.next(users);
+		}
 		return newUser;
 	}
 
@@ -160,8 +167,8 @@ export class FirebaseService {
 	}
 
 	getUsers$(): Observable<User[] | undefined> {
-		this._updateUsers();
-		return this.users$.asObservable();
+		this._getUsersOnce();
+		return this.users$!.asObservable();
 	}
 
 	createUser$(name: string, plate: string): Observable<User> {
