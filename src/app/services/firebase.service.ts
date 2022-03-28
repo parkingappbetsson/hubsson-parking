@@ -31,6 +31,7 @@ const firebaseConfig = {
 const USERS_COLLECTION = 'users';
 const RESERVATIONS_COLLECTION = 'reservations';
 const SECRET_CODE_COLLECTION = 'secret-code';
+const TWO_HOURS_IN_SECONDS = 2 * 60 * 60;
 
 @Injectable({
 	providedIn: 'root',
@@ -101,15 +102,20 @@ export class FirebaseService {
 		const reservationCollection = collection(this.db, RESERVATIONS_COLLECTION);
 
 		for (const reservationChange of reservationChanges) {
+			const upperBoundaryDate = new Timestamp(reservationChange.day.seconds + TWO_HOURS_IN_SECONDS, 0);
+			const lowerBoundaryDate = new Timestamp(reservationChange.day.seconds - TWO_HOURS_IN_SECONDS, 0);
 			const updateIndex = this.reservations.findIndex(
 				(oldReservation) =>
-					oldReservation.day.getTime() === reservationChange.day.toDate().getTime() &&
+					oldReservation.day.getTime() <= upperBoundaryDate.toDate().getTime() &&
+					oldReservation.day.getTime() >= lowerBoundaryDate.toDate().getTime() &&
 					oldReservation.userId === reservationChange.userId
 			);
 			if (updateIndex !== -1) {
+				// deletion needed
 				const reservationQuery = query(
 					reservationCollection,
-					where('day', '==', reservationChange.day),
+					where('day', '<=', upperBoundaryDate),
+					where('day', '>=', lowerBoundaryDate),
 					where('userId', '==', reservationChange.userId)
 				);
 				const reservationDoc = await getDocs(reservationQuery);
