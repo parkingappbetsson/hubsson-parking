@@ -26,7 +26,7 @@ type UserId = string;
 type ParkingSlotId = string;
 type ReservationDayDate = number;
 type UserIdByParkingSlotId = Record<ParkingSlotId, UserId>;
-const NUMBER_OF_DAYS = 7;
+const NUMBER_OF_DAYS = 8;
 
 @Component({
 	selector: 'hp-parking',
