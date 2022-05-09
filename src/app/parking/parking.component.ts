@@ -52,6 +52,7 @@ export class ParkingComponent implements OnInit, OnDestroy {
 	days: Day[] = Array(NUMBER_OF_DAYS).fill(0);
 	chosenDayIndex = 0;
 	selectedUser: User;
+	newReservationsCount = 0;
 
 	@HostBinding('class.hp-parking') hostCss = true;
 
@@ -109,9 +110,11 @@ export class ParkingComponent implements OnInit, OnDestroy {
 	takeParkingSlot(parkingSlotId: string) {
 		if (this.newReservations[this.chosenDayIndex] === parkingSlotId) {
 			delete this.newReservations[this.chosenDayIndex];
+			this.newReservationsCount--;
 			return;
 		}
 		this.newReservations[this.chosenDayIndex] = parkingSlotId;
+		this.newReservationsCount = Object.keys(this.newReservations).length;
 	}
 
 	cancelReservation(parkingSlotId: string) {
@@ -128,6 +131,7 @@ export class ParkingComponent implements OnInit, OnDestroy {
 		);
 		this.firebaseService.saveReservations$(newReservations);
 		this.newReservations = {};
+		this.newReservationsCount = 0;
 	}
 
 	isSlotFree(parkingSlotId: string): boolean {
@@ -142,6 +146,11 @@ export class ParkingComponent implements OnInit, OnDestroy {
 		return this.newReservations[this.chosenDayIndex] === parkingSlotId;
 	}
 
+	isDayCancellable(day: Day): boolean {
+		const userIdsForParkingSlotIdsOnDay = this.previousReservations?.[day.date.getDate()] ?? {};
+		return Object.entries(userIdsForParkingSlotIdsOnDay).some(([, userId]) => userId === this.selectedUser.id);
+	}
+
 	getReserverText(parkingSlotId: string): string {
 		const reserver = this.getReserver(parkingSlotId);
 		if (!reserver) {
@@ -151,7 +160,7 @@ export class ParkingComponent implements OnInit, OnDestroy {
 	}
 
 	isSaveDisabled(): boolean {
-		return this.newReservations && Object.keys(this.newReservations).length === 0;
+		return this.newReservationsCount === 0;
 	}
 
 	clearUser() {

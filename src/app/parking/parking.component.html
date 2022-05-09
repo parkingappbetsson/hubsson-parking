@@ -2,9 +2,11 @@
 	<mat-card
 		*ngFor="let day of days; index as dayIndex"
 		class="hp-parking-day-card"
-		[class.active]="chosenDayIndex === dayIndex"
+		[ngClass]="{
+			cancellable: isDayCancellable(day),
+			active: chosenDayIndex === dayIndex
+		}"
 		[matBadge]="getFreeSlotNumberForDay(day)"
-		matBadgeColor="accent"
 		(click)="chooseDay(dayIndex)"
 	>
 		<mat-card-content>
@@ -45,7 +47,9 @@
 		</ng-container>
 	</div>
 	<div class="hp-parking-submit-group">
-		<button (click)="onSave()" [disabled]="isSaveDisabled()" mat-raised-button color="primary">Save</button>
+		<button (click)="onSave()" [disabled]="isSaveDisabled()" mat-raised-button color="primary">
+			Save <span>({{ newReservationsCount }})</span>
+		</button>
 		<span>
 			Saving as <b>{{ selectedUser.name }} {{ selectedUser.plate }}</b>
 		</span>

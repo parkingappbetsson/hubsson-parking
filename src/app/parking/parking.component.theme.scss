@@ -13,6 +13,10 @@
 			background-color: mat.get-color-from-palette($primary-palette, 500);
 		}
 
+		&-day-card.cancellable .mat-badge-content {
+			background-color: mat.get-color-from-palette($primary-palette, 900);
+		}
+
 		&-day-card {
 			.mat-badge-content {
 				background-color: mat.get-color-from-palette($accent-palette, 600);

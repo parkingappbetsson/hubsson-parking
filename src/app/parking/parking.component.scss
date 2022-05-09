@@ -65,6 +65,10 @@
 				pointer-events: none;
 				color: rgba(255, 255, 255, 0.7);
 			}
+
+			&.pending .mat-card-subtitle {
+				text-decoration: line-through;
+			}
 		}
 	}
 
@@ -78,6 +82,12 @@
 			font-size: 20px;
 			line-height: 2.2;
 			margin-right: 8px;
+			span {
+				font-size: 16px;
+			}
+			.mat-button-wrapper {
+				display: flex;
+			}
 		}
 	}
 
