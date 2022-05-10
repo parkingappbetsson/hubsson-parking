@@ -20,9 +20,12 @@ export class SlackService {
 	slotCancelled(slotName: string, date: Date) {
 		const dateString = formatDate(date, 'EEEE, MM.d', this.locale);
 		const body = { text: `Reservation of ${slotName} has been cancelled for ${dateString}` };
-		this.http.post(this.#slackHookUrl!, JSON.stringify(body)).subscribe((res) => {
-			console.log(res);
-			console.log('res received');
-		});
+		this.http.post(this.#slackHookUrl!, JSON.stringify(body)).subscribe(
+			(res) => {
+				console.log(res);
+				console.log('res received');
+			},
+			(err) => {}
+		);
 	}
 }
