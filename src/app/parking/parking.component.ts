@@ -13,6 +13,7 @@ import { Timestamp } from '@firebase/firestore';
 import { merge, Subscription } from 'rxjs';
 import { filter, take, tap } from 'rxjs/operators';
 import { PREVIOUS_USER_STORAGE_KEY, SECRET_CODE_STORAGE_KEY, SELECTED_USER_STORAGE_KEY } from '../app.consts';
+import { SlackService } from '../services/slack.service';
 import { StorageService, StorageType } from '../services/storage.service';
 import { ReservationDTO, User } from './../services/db-models';
 import { FirebaseService } from './../services/firebase.service';
@@ -62,7 +63,12 @@ export class ParkingComponent implements OnInit, OnDestroy {
 	private data$$: Subscription | undefined;
 	private users: User[] | undefined;
 
-	constructor(private firebaseService: FirebaseService, private cdRef: ChangeDetectorRef, private router: Router) {
+	constructor(
+		private firebaseService: FirebaseService,
+		private cdRef: ChangeDetectorRef,
+		private router: Router,
+		private slackService: SlackService
+	) {
 		this.selectedUser = StorageService.getForKey(SELECTED_USER_STORAGE_KEY, StorageType.Local);
 		if (!this.selectedUser) {
 			this.router.navigate(['']);
@@ -122,13 +128,23 @@ export class ParkingComponent implements OnInit, OnDestroy {
 	}
 
 	onSave() {
-		const newReservations: ReservationDTO[] = Object.entries(this.newReservations).map(
-			([dayIndex, parkingSlotId]) => ({
-				userId: this.selectedUser!.id,
-				parkingSlot: parkingSlotId,
-				day: Timestamp.fromDate(this.days[+dayIndex].date),
-			})
-		);
+		const newReservationEntries = Object.entries(this.newReservations);
+		const newReservations: ReservationDTO[] = newReservationEntries.map(([dayIndex, parkingSlotId]) => ({
+			userId: this.selectedUser!.id,
+			parkingSlot: parkingSlotId,
+			day: Timestamp.fromDate(this.days[+dayIndex].date),
+		}));
+		// send slack notification if a slot is cancelled today or tomorrow
+		for (const [dayIndex, parkingSlotId] of newReservationEntries.filter(([dIndex]) => +dIndex < 2)) {
+			const prevReservationOnSlot =
+				this.previousReservations?.[this.days[+dayIndex].date.getDate()]?.[parkingSlotId];
+			if (!prevReservationOnSlot) {
+				continue;
+			}
+			const slotName = this.parkingSlots.find((slot) => slot.id === parkingSlotId)!.name;
+			const cancelledDay = this.days.find((day) => day.index === +dayIndex)!.date;
+			this.slackService.slotCancelled(slotName, cancelledDay);
+		}
 		this.firebaseService.saveReservations$(newReservations);
 		this.newReservations = {};
 		this.newReservationsCount = 0;

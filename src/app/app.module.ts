@@ -15,6 +15,7 @@ import { MatCardModule } from '@angular/material/card';
 import { MatBadgeModule } from '@angular/material/badge';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
+import { HttpClientModule } from '@angular/common/http';
 
 @NgModule({
 	declarations: [AppComponent, ParkingComponent, SecretCodeComponent, UserChooserComponent],
@@ -30,6 +31,7 @@ import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 		MatCardModule,
 		MatBadgeModule,
 		MatProgressSpinnerModule,
+		HttpClientModule,
 	],
 	providers: [],
 	bootstrap: [AppComponent],

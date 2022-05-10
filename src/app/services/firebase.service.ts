@@ -31,6 +31,7 @@ const firebaseConfig = {
 const USERS_COLLECTION = 'users';
 const RESERVATIONS_COLLECTION = 'reservations';
 const SECRET_CODE_COLLECTION = 'secret-code';
+const SLACK_HOOK_COLLECTION = 'slack-hook';
 const TWO_HOURS_IN_SECONDS = 2 * 60 * 60;
 
 @Injectable({
@@ -196,5 +197,9 @@ export class FirebaseService {
 
 	getSecretCollection(): CollectionReference<DocumentData> {
 		return collection(this.db, SECRET_CODE_COLLECTION);
+	}
+
+	getSlackHookCollection(): CollectionReference<DocumentData> {
+		return collection(this.db, SLACK_HOOK_COLLECTION);
 	}
 }
