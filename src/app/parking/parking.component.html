@@ -40,7 +40,9 @@
 				>
 					<mat-card-title>
 						<mat-icon
-							*ngIf="parkingSlot.id !== '0' && parkingSlot.id !== '1'"
+							*ngIf="
+								parkingSlot.id !== '0' && parkingSlot.id !== '1' && isSlotCancellable(parkingSlot.id)
+							"
 							svgIcon="address-card"
 							aria-hidden="false"
 							aria-label="View badge"
