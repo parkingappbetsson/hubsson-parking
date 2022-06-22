@@ -15,10 +15,11 @@ import {
 } from 'firebase/firestore';
 import { FirebaseApp, initializeApp } from 'firebase/app';
 import { collection } from 'firebase/firestore';
-import { BehaviorSubject, from, Observable, of, Subject } from 'rxjs';
+import { BehaviorSubject, from, Observable } from 'rxjs';
 import { environment } from 'src/environments/environment';
 import { Reservation, ReservationDTO, User } from './db-models';
 import { Auth, connectAuthEmulator, getAuth, signInAnonymously } from 'firebase/auth';
+import { getStorage, connectStorageEmulator, FirebaseStorage } from 'firebase/storage';
 
 const firebaseConfig = {
 	apiKey: 'AIzaSyB6rWaLwb8DsrYs7NMgZi0Avnqvun4k8UU',
@@ -41,6 +42,7 @@ export class FirebaseService {
 	private readonly app: FirebaseApp;
 	private readonly db: Firestore;
 	private readonly auth: Auth;
+	private readonly storage: FirebaseStorage;
 
 	private users$: BehaviorSubject<User[] | undefined> | undefined;
 	private reservations: Reservation[];
@@ -51,10 +53,12 @@ export class FirebaseService {
 
 		this.db = initializeFirestore(this.app, {});
 		this.auth = getAuth();
+		this.storage = getStorage();
 
 		if (!environment.production) {
-			connectFirestoreEmulator(this.db, 'localhost', 8080);
-			connectAuthEmulator(this.auth, 'http://localhost:9099');
+			connectFirestoreEmulator(this.db, '192.168.1.242', 8080);
+			connectAuthEmulator(this.auth, 'http://192.168.1.242:9099');
+			connectStorageEmulator(this.storage, '192.168.1.242', 9199);
 		}
 		this.reservations$ = new BehaviorSubject<Reservation[] | undefined>(undefined);
 		this.reservations = [];
@@ -201,5 +205,9 @@ export class FirebaseService {
 
 	getSlackHookCollection(): CollectionReference<DocumentData> {
 		return collection(this.db, SLACK_HOOK_COLLECTION);
+	}
+
+	getStorage(): FirebaseStorage {
+		return this.storage;
 	}
 }

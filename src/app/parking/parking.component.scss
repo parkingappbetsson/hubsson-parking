@@ -20,6 +20,14 @@
 		padding-bottom: 24px;
 	}
 
+	&-content-footer {
+		display: flex;
+		justify-content: space-between;
+		flex-wrap: wrap;
+		margin-top: 16px;
+		margin-right: 8px;
+	}
+
 	& &-day-card {
 		min-width: 64px;
 		max-width: 64px;
@@ -48,11 +56,19 @@
 	}
 
 	&-parking-slot-card {
-		margin: 0 10px 10px 0;
+		margin: 0 15px 15px 5px;
 		min-width: 120px;
 		max-width: 120px;
 		min-height: 50px;
 		max-height: 50px;
+
+		.badge-icon {
+			position: absolute;
+			left: -10px;
+			top: -10px;
+			height: 32px;
+			width: 36px;
+		}
 
 		&.taken {
 			cursor: default;
@@ -70,6 +86,21 @@
 				text-decoration: line-through;
 			}
 		}
+
+		.mat-card-title {
+			display: flex;
+			justify-content: center;
+			align-items: center;
+		}
+
+		&:not(.cancellable) .mat-card-title {
+			height: 100%;
+		}
+
+		&.cancellable .mat-card-title {
+			font-size: 18px;
+			width: 100%;
+		}
 	}
 
 	&-submit-group {
@@ -77,6 +108,7 @@
 		align-items: center;
 		justify-content: flex-start;
 		font-size: 16px;
+		margin: 8px;
 
 		button {
 			font-size: 20px;
@@ -92,9 +124,7 @@
 	}
 
 	& &-logout {
-		margin-top: 16px;
-		margin-right: 8px;
-		float: right;
+		margin: 8px;
 	}
 
 	@media (min-width: 768px) {

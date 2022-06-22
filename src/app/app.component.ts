@@ -1,7 +1,4 @@
-import { Component, HostBinding, ViewEncapsulation } from '@angular/core';
-import { Router } from '@angular/router';
-import { StorageService, StorageType } from './services/storage.service';
-import { SECRET_CODE_STORAGE_KEY } from './app.consts';
+import { Component, ViewEncapsulation } from '@angular/core';
 
 @Component({
 	selector: 'app-root',
@@ -9,4 +6,5 @@ import { SECRET_CODE_STORAGE_KEY } from './app.consts';
 	styleUrls: ['./app.component.scss'],
 	encapsulation: ViewEncapsulation.None,
 })
-export class AppComponent {}
+export class AppComponent {
+}

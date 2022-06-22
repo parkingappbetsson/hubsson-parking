@@ -38,7 +38,17 @@
 					class="hp-parking-parking-slot-card taken"
 					(click)="cancelReservation(parkingSlot.id)"
 				>
-					<mat-card-title>{{ parkingSlot.name }}</mat-card-title>
+					<mat-card-title>
+						<mat-icon
+							*ngIf="parkingSlot.id !== '0' && parkingSlot.id !== '1'"
+							svgIcon="address-card"
+							aria-hidden="false"
+							aria-label="View badge"
+							class="badge-icon"
+							(click)="openBadge($event, parkingSlot.id)"
+						></mat-icon>
+						{{ parkingSlot.name }}</mat-card-title
+					>
 					<mat-card-subtitle>
 						{{ getReserverText(parkingSlot.id) }}
 					</mat-card-subtitle>
@@ -46,13 +56,15 @@
 			</ng-template>
 		</ng-container>
 	</div>
-	<div class="hp-parking-submit-group">
-		<button (click)="onSave()" [disabled]="isSaveDisabled()" mat-raised-button color="primary">
-			Save <span>({{ newReservationsCount }})</span>
-		</button>
-		<span>
-			Saving as <b>{{ selectedUser.name }} {{ selectedUser.plate }}</b>
-		</span>
+	<div class="hp-parking-content-footer">
+		<div class="hp-parking-submit-group">
+			<button (click)="onSave()" [disabled]="isSaveDisabled()" mat-raised-button color="primary">
+				Save <span>({{ newReservationsCount }})</span>
+			</button>
+			<span>
+				Saving as <b>{{ selectedUser.name }} {{ selectedUser.plate }}</b>
+			</span>
+		</div>
+		<button (click)="clearUser()" class="hp-parking-logout" mat-raised-button color="accent">Logout</button>
 	</div>
-	<button (click)="clearUser()" class="hp-parking-logout" mat-raised-button color="accent">Logout</button>
 </div>

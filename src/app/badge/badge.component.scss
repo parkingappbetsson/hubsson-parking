@@ -1,0 +1,55 @@
+.hp-badge {
+	height: 100%;
+	width: 100%;
+
+	&-cancel-group {
+		margin-top: 12px;
+		h2 {
+			color: red;
+			margin-bottom: 0;
+		}
+	}
+
+	&-image {
+		overflow: scroll;
+		img {
+			height: 290px;
+			width: 439px;
+		}
+	}
+
+	@media (width: 414px) {
+		img {
+			height: 380px;
+			width: 575px;
+		}
+	}
+
+	@media (width: 375px) {
+		img {
+			height: 350px;
+			width: 530px;
+		}
+	}
+
+	@media (width: 390px) {
+		img {
+			height: 350px;
+			width: 530px;
+		}
+	}
+	// android
+	@media (width: 360px) {
+		img {
+			height: 350px;
+			width: 530px;
+		}
+	}
+
+	@media (width: 412px) {
+		img {
+			height: 380px;
+			width: 575px;
+		}
+	}
+}

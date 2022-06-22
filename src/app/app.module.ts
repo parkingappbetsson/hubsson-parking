@@ -16,9 +16,11 @@ import { MatBadgeModule } from '@angular/material/badge';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { HttpClientModule } from '@angular/common/http';
+import { MatIconModule } from '@angular/material/icon';
+import { BadgeComponent } from './badge/badge.component';
 
 @NgModule({
-	declarations: [AppComponent, ParkingComponent, SecretCodeComponent, UserChooserComponent],
+	declarations: [AppComponent, ParkingComponent, SecretCodeComponent, UserChooserComponent, BadgeComponent],
 	imports: [
 		BrowserModule,
 		AppRoutingModule,
@@ -32,6 +34,7 @@ import { HttpClientModule } from '@angular/common/http';
 		MatBadgeModule,
 		MatProgressSpinnerModule,
 		HttpClientModule,
+		MatIconModule,
 	],
 	providers: [],
 	bootstrap: [AppComponent],

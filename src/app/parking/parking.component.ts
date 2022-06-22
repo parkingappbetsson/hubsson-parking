@@ -7,7 +7,9 @@ import {
 	OnInit,
 	ViewEncapsulation,
 } from '@angular/core';
-import { Router } from '@angular/router';
+import { MatIconRegistry } from '@angular/material/icon';
+import { DomSanitizer } from '@angular/platform-browser';
+import { ActivatedRoute, ParamMap, Router } from '@angular/router';
 
 import { Timestamp } from '@firebase/firestore';
 import { merge, Subscription } from 'rxjs';
@@ -67,12 +69,19 @@ export class ParkingComponent implements OnInit, OnDestroy {
 		private firebaseService: FirebaseService,
 		private cdRef: ChangeDetectorRef,
 		private router: Router,
-		private slackService: SlackService
+		private slackService: SlackService,
+		private route: ActivatedRoute,
+		sanitizer: DomSanitizer,
+		iconRegistry: MatIconRegistry
 	) {
 		this.selectedUser = StorageService.getForKey(SELECTED_USER_STORAGE_KEY, StorageType.Local);
 		if (!this.selectedUser) {
 			this.router.navigate(['']);
 		}
+		iconRegistry.addSvgIcon(
+			'address-card',
+			sanitizer.bypassSecurityTrustResourceUrl('./assets/address-card-regular.svg')
+		);
 	}
 
 	ngOnInit() {
@@ -102,7 +111,19 @@ export class ParkingComponent implements OnInit, OnDestroy {
 			tap((users) => (this.users = users))
 		);
 
-		this.data$$ = merge(previousReservations$, users$).subscribe(() => this.cdRef.markForCheck());
+		const queryParams$ = this.route.queryParamMap.pipe(
+			tap((params: ParamMap) => {
+				const cancelledSlotId = params.get('cancel');
+				const dayIndex = params.get('dayIndex');
+				if (cancelledSlotId && dayIndex) {
+					this.chooseDay(+dayIndex);
+					this.cancelReservation(cancelledSlotId);
+					this.onSave();
+				}
+			})
+		);
+
+		this.data$$ = merge(previousReservations$, users$, queryParams$).subscribe(() => this.cdRef.markForCheck());
 	}
 
 	ngOnDestroy() {
@@ -188,6 +209,15 @@ export class ParkingComponent implements OnInit, OnDestroy {
 
 	getFreeSlotNumberForDay(day: Day): number {
 		return this.parkingSlots.length - Object.keys(this.previousReservations?.[day.date.getDate()] ?? {}).length;
+	}
+
+	openBadge(event: MouseEvent, parkingSlotId: string) {
+		event.preventDefault();
+		event.stopPropagation();
+		this.router.navigate([parkingSlotId], {
+			relativeTo: this.route,
+			queryParams: { dayIndex: this.chosenDayIndex },
+		});
 	}
 
 	private isSelectedUserTheReserver(parkingSlotId: string): boolean {
