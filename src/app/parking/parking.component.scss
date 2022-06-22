@@ -93,7 +93,7 @@
 			align-items: center;
 		}
 
-		&:not(.cancellable) .mat-card-title {
+		&:not(.cancellable):not(.taken) .mat-card-title {
 			height: 100%;
 		}
 
