@@ -22,12 +22,12 @@ import { Auth, connectAuthEmulator, getAuth, signInAnonymously } from 'firebase/
 import { getStorage, connectStorageEmulator, FirebaseStorage } from 'firebase/storage';
 
 const firebaseConfig = {
-	apiKey: 'AIzaSyB6rWaLwb8DsrYs7NMgZi0Avnqvun4k8UU',
-	authDomain: 'hubsson-parking.firebaseapp.com',
-	projectId: 'hubsson-parking',
-	storageBucket: 'hubsson-parking.appspot.com',
-	messagingSenderId: '1061531745136',
-	appId: '1:1061531745136:web:dc6eb056860850f9ebedb5',
+  apiKey: "AIzaSyCQCFVIOq_A4vUWSdeuHZnrQe0Qo6xbc6M",
+  authDomain: "hubsson-parking-407ed.firebaseapp.com",
+  projectId: "hubsson-parking-407ed",
+  storageBucket: "hubsson-parking-407ed.appspot.com",
+  messagingSenderId: "997921083566",
+  appId: "1:997921083566:web:d00ce841a2e7c92d0e5d3f"
 };
 const USERS_COLLECTION = 'users';
 const RESERVATIONS_COLLECTION = 'reservations';

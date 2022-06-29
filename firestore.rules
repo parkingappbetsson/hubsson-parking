@@ -13,6 +13,5 @@ service cloud.firestore {
     match /secret-code/{document=**} {
       allow read: if true;
     }
-    
   }
 }
