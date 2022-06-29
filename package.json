@@ -22,7 +22,7 @@
     "@angular/platform-browser": "~12.2.0",
     "@angular/platform-browser-dynamic": "~12.2.0",
     "@angular/router": "~12.2.0",
-    "@slack/web-api": "^6.7.1",
+    "@slack/web-api": "^5.11.0",
     "firebase": "^9.1.2",
     "rxjs": "~6.6.0",
     "tslib": "^2.3.0",
