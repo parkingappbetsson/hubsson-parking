@@ -153,6 +153,7 @@ export class ParkingComponent implements OnInit, OnDestroy {
 		const newReservations: ReservationDTO[] = newReservationEntries.map(([dayIndex, parkingSlotId]) => ({
 			userId: this.selectedUser!.id,
 			parkingSlot: parkingSlotId,
+      createdAt: new Date(),
 			day: Timestamp.fromDate(this.days[+dayIndex].date),
 		}));
 		// send slack notification if a slot is cancelled today or tomorrow

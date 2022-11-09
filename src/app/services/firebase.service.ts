@@ -60,6 +60,7 @@ export class FirebaseService {
 			connectAuthEmulator(this.auth, 'http://192.168.1.242:9099');
 			connectStorageEmulator(this.storage, '192.168.1.242', 9199);
 		}
+
 		this.reservations$ = new BehaviorSubject<Reservation[] | undefined>(undefined);
 		this.reservations = [];
 	}
@@ -139,6 +140,7 @@ export class FirebaseService {
 			this.reservations.push({
 				userId,
 				parkingSlot,
+        createdAt: new Date(),
 				day: (day as Timestamp).toDate(),
 			});
 		}
@@ -157,10 +159,11 @@ export class FirebaseService {
 		const reservations: Reservation[] = [];
 		const reservationsSnapshot = await getDocs(reservationsQuery);
 		reservationsSnapshot.forEach((doc) => {
-			const { day, userId, parkingSlot } = doc.data();
+			const { day, userId, createdAt, parkingSlot } = doc.data();
 			reservations.push({
 				userId,
 				parkingSlot,
+        createdAt,
 				day: (day as Timestamp).toDate(),
 			});
 		});
