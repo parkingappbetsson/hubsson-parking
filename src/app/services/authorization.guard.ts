@@ -18,21 +18,22 @@ export class AuthorizationGuard implements CanActivate {
 	) {}
 
 	canActivate(): Observable<UrlTree | boolean> {
-		const secretCode = StorageService.getForKey(SECRET_CODE_STORAGE_KEY, StorageType.Local);
-		const fallback$ = of(this.router.parseUrl(''));
-		if (!secretCode) {
-			return fallback$;
-		}
-		return this.authorizationService.authorize(secretCode).pipe(
-			filter(Boolean),
-			withLatestFrom(this.firebaseService.login$()),
-			map(([, val]) => {
-				return val === true ? true : this.router.parseUrl('');
-			}),
-			catchError((err) => {
-				console.error(err);
-				return fallback$;
-			})
-		);
+		// const secretCode = StorageService.getForKey(SECRET_CODE_STORAGE_KEY, StorageType.Local);
+		// const fallback$ = of(this.router.parseUrl(''));
+		// if (!secretCode) {
+		// 	return fallback$;
+		// }
+		// return this.authorizationService.authorize(secretCode).pipe(
+		// 	filter(Boolean),
+		// 	withLatestFrom(this.firebaseService.login$()),
+		// 	map(([, val]) => {
+		// 		return val === true ? true : this.router.parseUrl('');
+		// 	}),
+		// 	catchError((err) => {
+		// 		console.error(err);
+		// 		return fallback$;
+		// 	})
+		// );
+		return of(true);
 	}
 }

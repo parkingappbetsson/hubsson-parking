@@ -2,6 +2,7 @@ import { Component, HostBinding, OnInit, ViewEncapsulation } from '@angular/core
 import { Router } from '@angular/router';
 import { SECRET_CODE_STORAGE_KEY, SELECTED_USER_STORAGE_KEY } from '../app.consts';
 import { StorageService, StorageType } from '../services/storage.service';
+import { ReCaptchaV3Service } from 'ng-recaptcha';
 
 @Component({
 	selector: 'hp-secret-code',
@@ -15,7 +16,10 @@ export class SecretCodeComponent implements OnInit {
 
 	busy = true;
 
-	constructor(private router: Router) {}
+	constructor(
+		private router: Router,
+		private recaptchaV3Service: ReCaptchaV3Service
+	) { }
 
 	ngOnInit() {
 		const secretCode = StorageService.getForKey(SECRET_CODE_STORAGE_KEY, StorageType.Local);
@@ -28,7 +32,11 @@ export class SecretCodeComponent implements OnInit {
 	}
 
 	setSecretAndGo() {
-		StorageService.setForKey(SECRET_CODE_STORAGE_KEY, this.secretCode, StorageType.Local);
-		this.router.navigate(['choose-user']);
+		this.recaptchaV3Service.execute('importantAction')
+			.subscribe((token: string) => {
+				console.debug(`Token [${token}] generated`);
+				StorageService.setForKey(SECRET_CODE_STORAGE_KEY, this.secretCode, StorageType.Local);
+				this.router.navigate(['choose-user']);
+			});
 	}
 }
