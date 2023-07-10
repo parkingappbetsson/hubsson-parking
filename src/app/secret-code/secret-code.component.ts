@@ -1,6 +1,6 @@
 import { Component, HostBinding, OnInit, ViewEncapsulation } from '@angular/core';
 import { Router } from '@angular/router';
-import { SECRET_CODE_STORAGE_KEY, SELECTED_USER_STORAGE_KEY } from '../app.consts';
+import { RECAPCHA, SECRET_CODE_STORAGE_KEY, SELECTED_USER_STORAGE_KEY } from '../app.consts';
 import { StorageService, StorageType } from '../services/storage.service';
 import { ReCaptchaV3Service } from 'ng-recaptcha';
 
@@ -13,17 +13,20 @@ import { ReCaptchaV3Service } from 'ng-recaptcha';
 export class SecretCodeComponent implements OnInit {
 	@HostBinding('class.hp-secret-code') hostCss = true;
 	secretCode: string | undefined;
+	isRecaphaSolved: string | undefined;
+	token: string | undefined;
 
 	busy = true;
 
 	constructor(
-		private router: Router,
-		private recaptchaV3Service: ReCaptchaV3Service
+		private router: Router
 	) { }
 
 	ngOnInit() {
 		const secretCode = StorageService.getForKey(SECRET_CODE_STORAGE_KEY, StorageType.Local);
 		const selectedUser = StorageService.getForKey(SELECTED_USER_STORAGE_KEY, StorageType.Local);
+		this.isRecaphaSolved = StorageService.getForKey(RECAPCHA, StorageType.Local);
+		
 		if (secretCode && selectedUser) {
 			this.router.navigate(['parking']);
 			return;
@@ -32,11 +35,7 @@ export class SecretCodeComponent implements OnInit {
 	}
 
 	setSecretAndGo() {
-		this.recaptchaV3Service.execute('importantAction')
-			.subscribe((token: string) => {
-				console.debug(`Token [${token}] generated`);
-				StorageService.setForKey(SECRET_CODE_STORAGE_KEY, this.secretCode, StorageType.Local);
-				this.router.navigate(['choose-user']);
-			});
+		StorageService.setForKey(SECRET_CODE_STORAGE_KEY, this.secretCode, StorageType.Local);
+		this.router.navigate(['choose-user']);
 	}
 }

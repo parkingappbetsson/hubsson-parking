@@ -5,7 +5,7 @@
 export const environment = {
 	production: false,
 	recaptcha: {
-		siteKey: '6Ld2BeImAAAAAJhuu6ASgRZjD6vwKtcProYgNd42',
+		siteKey: '6Le2n-cmAAAAAGwJQ31pcsvIVEJLoiY3ZqOUQyxw',
 	  },
 };
 

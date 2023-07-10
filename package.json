@@ -29,7 +29,7 @@
     "@fortawesome/free-solid-svg-icons": "^6.4.0",
     "@slack/web-api": "^5.11.0",
     "firebase": "^9.1.2",
-    "ng-recaptcha": "^12.0.1",
+    "ng-recaptcha": "^10.0.0",
     "rxjs": "~6.6.0",
     "tslib": "^2.3.0",
     "zone.js": "~0.11.4"

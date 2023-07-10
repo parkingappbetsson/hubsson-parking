@@ -20,7 +20,7 @@ import { MatIconModule } from '@angular/material/icon';
 import { BadgeComponent } from './badge/badge.component';
 import { ServiceWorkerModule } from '@angular/service-worker';
 import { environment } from '../environments/environment';
-import { RECAPTCHA_V3_SITE_KEY, RecaptchaV3Module } from 'ng-recaptcha';
+import { RECAPTCHA_SETTINGS, RecaptchaFormsModule, RecaptchaModule, RecaptchaSettings } from 'ng-recaptcha';
 
 @NgModule({
 	declarations: [AppComponent, ParkingComponent, SecretCodeComponent, UserChooserComponent, BadgeComponent],
@@ -38,7 +38,8 @@ import { RECAPTCHA_V3_SITE_KEY, RecaptchaV3Module } from 'ng-recaptcha';
 		MatProgressSpinnerModule,
 		HttpClientModule,
 		MatIconModule,
-		RecaptchaV3Module,
+		RecaptchaModule,
+		RecaptchaFormsModule,
 		ServiceWorkerModule.register('ngsw-worker.js', {
 			enabled: environment.production,
 			// Register the ServiceWorker as soon as the app is stable
@@ -47,9 +48,11 @@ import { RECAPTCHA_V3_SITE_KEY, RecaptchaV3Module } from 'ng-recaptcha';
 		}),
 	],
 	providers: [{
-		provide: RECAPTCHA_V3_SITE_KEY,
-		useValue: environment.recaptcha.siteKey,
-	  },],
+		provide: RECAPTCHA_SETTINGS,
+		useValue: {
+			siteKey: environment.recaptcha.siteKey,
+		} as RecaptchaSettings,
+	},],
 	bootstrap: [AppComponent],
 })
 export class AppModule {}
