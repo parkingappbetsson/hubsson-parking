@@ -28,4 +28,16 @@ export class SlackService {
 			(err) => {}
 		);
 	}
+
+	hubsson1or2Booked(slotName: string, date: Date) {
+		const dateString = formatDate(date, 'EEEE, MM.d HH:MM:SS', this.locale);
+		const body = { text: `${slotName} has been booked at ${dateString}` };
+		this.http.post(this.#slackHookUrl!, JSON.stringify(body)).subscribe(
+			(res) => {
+				console.log(res);
+				console.log('res received');
+			},
+			(err) => {}
+		);
+	}
 }
