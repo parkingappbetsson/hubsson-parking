@@ -19,11 +19,14 @@ import { SlackService } from '../services/slack.service';
 import { StorageService, StorageType } from '../services/storage.service';
 import { ReservationDTO, User } from './../services/db-models';
 import { FirebaseService } from './../services/firebase.service';
+import { botdPromise } from '../app.module';
+import { IBotDetectionResult } from '../global/global.interfaces';
 
 interface Day {
 	date: Date;
 	index: number;
 }
+
 type DayIndex = number;
 type UserId = string;
 type ParkingSlotId = string;
@@ -156,14 +159,9 @@ export class ParkingComponent implements OnInit, OnDestroy {
 			createdAt: new Date(),
 			day: Timestamp.fromDate(this.days[+dayIndex].date),
 		}));
-		// send slack notification if a slot is cancelled today or tomorrow
-		for (const [dayIndex, parkingSlotId] of newReservationEntries) {
-			const slotName = this.parkingSlots.find((slot) => slot.id === parkingSlotId)!.name;
+		this.sendSlackMassageAboutMonitoredParkingSpaceBooking(newReservationEntries);
 
-			if (parkingSlotId === '0' || parkingSlotId === '1') {
-				this.slackService.hubsson1or2Booked(slotName);
-			}
-		}
+		// send slack notification if a slot is cancelled today or tomorrow
 		for (const [dayIndex, parkingSlotId] of newReservationEntries.filter(([dIndex]) => +dIndex < 2)) {
 			const prevReservationOnSlot =
 				this.previousReservations?.[this.days[+dayIndex].date.getDate()]?.[parkingSlotId];
@@ -243,5 +241,30 @@ export class ParkingComponent implements OnInit, OnDestroy {
 
 	private getReserverId(parkingSlotId: string): string | undefined {
 		return this.previousReservations?.[this.days[this.chosenDayIndex].date.getDate()]?.[parkingSlotId];
+	}
+
+	private sendSlackMassageAboutMonitoredParkingSpaceBooking(newReservationEntries: [string, string][]): void {
+		let botResult: IBotDetectionResult = {
+			bot: false,
+		};
+
+		botdPromise
+			.then((botd) => botd.detect())
+			.then((result) => {
+				botResult = result;
+			})
+			.catch((error) => {
+				console.error(error);
+				botResult = {...botResult, error}
+			})
+			.finally(() => {
+				for (const [dayIndex, parkingSlotId] of newReservationEntries) {
+					const slotName = this.parkingSlots.find((slot) => slot.id === parkingSlotId)!.name;
+
+					if (parkingSlotId === '0' || parkingSlotId === '1') {
+						this.slackService.hubsson1or2Booked(slotName, botResult);
+					}
+				}
+			});
 	}
 }

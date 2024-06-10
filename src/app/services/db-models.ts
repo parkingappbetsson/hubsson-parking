@@ -13,7 +13,7 @@ export interface Reservation extends ReservationBase {
 export interface ReservationBase {
 	userId: string;
 	parkingSlot: string;
-  createdAt: Date;
+	createdAt: Date;
 }
 
 export interface ReservationDTO extends ReservationBase {

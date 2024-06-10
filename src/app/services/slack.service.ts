@@ -3,6 +3,7 @@ import { HttpClient } from '@angular/common/http';
 import { Inject, Injectable, LOCALE_ID } from '@angular/core';
 import { getDocs } from 'firebase/firestore';
 import { FirebaseService } from './firebase.service';
+import { IBotDetectionResult } from '../global/global.interfaces';
 
 const slackLogURl = 'https://hooks.slack.com/services/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';
 
@@ -31,10 +32,14 @@ export class SlackService {
 		);
 	}
 
-	hubsson1or2Booked(slotName: string) {
+	hubsson1or2Booked(slotName: string, botDetails: IBotDetectionResult): void {
 		const today = new Date();
 		const dateString = formatDate(today, 'EEEE, MM.d HH:MM:SS', this.locale);
-		const body = { text: `${slotName} has been booked at ${dateString}` };
+		const body = { text: `${slotName} has been booked at ${dateString}. ${botDetails.bot ? 
+				`User has ussed a bot, type ${botDetails.botKind}`:
+						botDetails.error ? 
+						`There has been an error detecting the bot: ${botDetails.error}`: 
+						"No bot has been used"}` };
 		this.http.post(slackLogURl, JSON.stringify(body)).subscribe(
 			(res) => {
 				console.log(res);

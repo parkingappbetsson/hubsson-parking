@@ -1,4 +1,4 @@
-import { NgModule } from '@angular/core';
+import { APP_INITIALIZER, NgModule } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { BrowserModule } from '@angular/platform-browser';
 
@@ -20,6 +20,16 @@ import { MatIconModule } from '@angular/material/icon';
 import { BadgeComponent } from './badge/badge.component';
 import { ServiceWorkerModule } from '@angular/service-worker';
 import { environment } from '../environments/environment';
+import { load } from '@fingerprintjs/botd';
+
+export let botdPromise: Promise<any>;
+
+function initBotDetector(): Promise<void> {
+	return new Promise((resolve) => {
+		botdPromise = load();
+		resolve();
+	});
+}
 
 @NgModule({
 	declarations: [AppComponent, ParkingComponent, SecretCodeComponent, UserChooserComponent, BadgeComponent],
@@ -37,14 +47,20 @@ import { environment } from '../environments/environment';
 		MatProgressSpinnerModule,
 		HttpClientModule,
 		MatIconModule,
-  ServiceWorkerModule.register('ngsw-worker.js', {
-    enabled: environment.production,
-    // Register the ServiceWorker as soon as the app is stable
-    // or after 30 seconds (whichever comes first).
-    registrationStrategy: 'registerWhenStable:30000'
-  }),
+		ServiceWorkerModule.register('ngsw-worker.js', {
+			enabled: environment.production,
+			// Register the ServiceWorker as soon as the app is stable
+			// or after 30 seconds (whichever comes first).
+			registrationStrategy: 'registerWhenStable:30000',
+		}),
 	],
-	providers: [],
 	bootstrap: [AppComponent],
+	providers: [
+		{
+			provide: APP_INITIALIZER,
+			useFactory: () => initBotDetector,
+			multi: true,
+		},
+	],
 })
 export class AppModule {}

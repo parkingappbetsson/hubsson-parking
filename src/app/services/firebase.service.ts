@@ -22,12 +22,12 @@ import { Auth, connectAuthEmulator, getAuth, signInAnonymously } from 'firebase/
 import { getStorage, connectStorageEmulator, FirebaseStorage } from 'firebase/storage';
 
 const firebaseConfig = {
-  apiKey: "AIzaSyCQCFVIOq_A4vUWSdeuHZnrQe0Qo6xbc6M",
-  authDomain: "hubsson-parking-407ed.firebaseapp.com",
-  projectId: "hubsson-parking-407ed",
-  storageBucket: "hubsson-parking-407ed.appspot.com",
-  messagingSenderId: "997921083566",
-  appId: "1:997921083566:web:d00ce841a2e7c92d0e5d3f"
+	apiKey: 'AIzaSyCQCFVIOq_A4vUWSdeuHZnrQe0Qo6xbc6M',
+	authDomain: 'hubsson-parking-407ed.firebaseapp.com',
+	projectId: 'hubsson-parking-407ed',
+	storageBucket: 'hubsson-parking-407ed.appspot.com',
+	messagingSenderId: '997921083566',
+	appId: '1:997921083566:web:d00ce841a2e7c92d0e5d3f',
 };
 const USERS_COLLECTION = 'users';
 const RESERVATIONS_COLLECTION = 'reservations';
@@ -56,7 +56,7 @@ export class FirebaseService {
 		this.storage = getStorage();
 
 		if (!environment.production) {
-			connectFirestoreEmulator(this.db, '192.168.1.242', 8080);
+			connectFirestoreEmulator(this.db, 'localhost', 8080);
 			connectAuthEmulator(this.auth, 'http://192.168.1.242:9099');
 			connectStorageEmulator(this.storage, '192.168.1.242', 9199);
 		}
@@ -140,7 +140,7 @@ export class FirebaseService {
 			this.reservations.push({
 				userId,
 				parkingSlot,
-        createdAt: new Date(),
+				createdAt: new Date(),
 				day: (day as Timestamp).toDate(),
 			});
 		}
@@ -163,7 +163,7 @@ export class FirebaseService {
 			reservations.push({
 				userId,
 				parkingSlot,
-        createdAt,
+				createdAt,
 				day: (day as Timestamp).toDate(),
 			});
 		});
