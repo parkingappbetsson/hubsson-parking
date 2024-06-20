@@ -4,7 +4,7 @@ import { Inject, Injectable, LOCALE_ID } from '@angular/core';
 import { getDocs } from 'firebase/firestore';
 import { FirebaseService } from './firebase.service';
 
-const slackLogURl = 'https://hooks.slack.com/services/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';
+const slackLogURl = 'https://hooks.slack.com/services/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';
 
 @Injectable({ providedIn: 'root' })
 export class SlackService {
