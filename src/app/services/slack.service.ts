@@ -4,17 +4,17 @@ import { Inject, Injectable, LOCALE_ID } from '@angular/core';
 import { getDocs } from 'firebase/firestore';
 import { FirebaseService } from './firebase.service';
 
-const slackLogURl = 'https://hooks.slack.com/services/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';
-
 @Injectable({ providedIn: 'root' })
 export class SlackService {
 	#slackHookUrl: string | undefined;
+	#slackLogUrl: string | undefined;
 
 	constructor(private http: HttpClient, @Inject(LOCALE_ID) private locale: string, fbService: FirebaseService) {
 		getDocs(fbService.getSlackHookCollection()).then((docs) =>
 			docs.forEach((doc) => {
-				const { url } = doc.data();
+				const { url, logUrl } = doc.data();
 				this.#slackHookUrl = url;
+				this.#slackLogUrl = logUrl;
 			})
 		);
 	}
@@ -27,7 +27,7 @@ export class SlackService {
 				console.log(res);
 				console.log('res received');
 			},
-			(err) => {}
+			(err) => { }
 		);
 	}
 
@@ -35,12 +35,12 @@ export class SlackService {
 		const today = new Date();
 		const dateString = formatDate(today, 'EEEE, MM.d HH:MM:SS', this.locale);
 		const body = { text: `${slotName} has been booked at ${dateString}` };
-		this.http.post(slackLogURl, JSON.stringify(body)).subscribe(
+		this.http.post(this.#slackLogUrl!, JSON.stringify(body)).subscribe(
 			(res) => {
 				console.log(res);
 				console.log('res received');
 			},
-			(err) => {}
+			(err) => { }
 		);
 	}
 }
