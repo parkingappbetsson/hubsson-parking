@@ -156,14 +156,19 @@ export class ParkingComponent implements OnInit, OnDestroy {
 			createdAt: new Date(),
 			day: Timestamp.fromDate(this.days[+dayIndex].date),
 		}));
-		// send slack notification if a slot is cancelled today or tomorrow
+		// log to slack if a slot is booked for hutsson1 or hubsson2
 		for (const [dayIndex, parkingSlotId] of newReservationEntries) {
 			const slotName = this.parkingSlots.find((slot) => slot.id === parkingSlotId)!.name;
 
-			if (parkingSlotId === '0' || parkingSlotId === '1') {
-				this.slackService.hubsson1or2Booked(slotName);
+			const prevReservationOnSlot =
+				this.previousReservations?.[this.days[+dayIndex].date.getDate()]?.[parkingSlotId];
+			if (!prevReservationOnSlot) {
+				if (parkingSlotId === '0' || parkingSlotId === '1') {
+					this.slackService.hubsson1or2Booked(slotName);
+				}
 			}
 		}
+		// send slack notification if a slot is cancelled today or tomorrow
 		for (const [dayIndex, parkingSlotId] of newReservationEntries.filter(([dIndex]) => +dIndex < 2)) {
 			const prevReservationOnSlot =
 				this.previousReservations?.[this.days[+dayIndex].date.getDate()]?.[parkingSlotId];
